@@ -329,13 +329,14 @@ function spawnMoko() {
   const el=document.createElement('div');
   el.className='moko';
   el.dataset.points=def.points;
-  el.dataset.color=def.body;
+  el.dataset.color=def.color;
   el.dataset.name=def.name;
   el.dataset.rare=def.rare?'1':'0';
 
   // 绘制萌可用真实图片
+  const sz=def.rare?72:58;
   el.innerHTML=`
-    <img src="${def.img}" style="width:${sz}px;height:${sz}px;border-radius:50%;object-fit:cover;border:3px solid ${def.color};box-shadow:0 4px 12px rgba(0,0,0,.15);" alt="${def.name}">
+    <img src="${def.img}" style="width:${sz}px;height:${sz}px;border-radius:50%;object-fit:cover;border:3px solid ${def.color};box-shadow:0 4px 12px rgba(0,0,0,.15);display:block;" alt="${def.name}">
     ${def.rare?'<span style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);font-size:20px;">👑</span>':''}
     <span class="moko-name" style="color:${def.color};font-weight:900;font-size:11px;">${def.name}</span>
   `;
@@ -345,7 +346,7 @@ function spawnMoko() {
   el.style.top=(20+Math.random()*(ah-150))+'px';
   if(def.rare) el.style.zIndex='6';
 
-  el.addEventListener('pointerdown',(e)=>{ e.preventDefault(); tapMoko(el,def.points,def.cheek,def.name); });
+  el.addEventListener('pointerdown',(e)=>{ e.preventDefault(); tapMoko(el,def.points,def.color,def.name); });
   ga.appendChild(el);
   activeMokos.push(el);
 
