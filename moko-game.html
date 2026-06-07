@@ -259,104 +259,120 @@ function toggleSpeech(){spActive=!spActive;if(!spActive){speechSynthesis.cancel(
 let rec=null;
 function initRec(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){
-    vb.style.opacity='0.3';
-    vb.title='语音不可用';
-    return;
+  if(!SR){vb.style.opacity='0.3';vb.title='语音不可用';return;}
+
+  let activeRec=null, isActive=false;
+
+  function safeStop(){
+    if(activeRec){
+      try{activeRec.stop();}catch(e){}
+      try{activeRec.abort();}catch(e){}
+      activeRec=null;
+    }
+    isActive=false;
+    vb.classList.remove('rec');
+    vb.textContent='🎤';
   }
 
-  // iPhone 上需要每次点击都重新创建实例
-  function createRecognition(){
-    const r = new SR();
-    r.lang = 'zh-CN';
-    r.continuous = false;
-    r.interimResults = true;
+  function safeStart(){
+    safeStop();
+    const r=new SR();
+    activeRec=r;
+    r.lang='zh-CN';
+    r.continuous=false;
+    r.interimResults=true;
 
-    r.onresult = function(ev){
-      let text = '';
+    r.onspeechstart=()=>{ vsText.textContent='正在听…'; vsRes.textContent=''; };
+    r.onaudiostart=()=>{ vsText.textContent='🎙 麦克风工作中…'; };
+
+    r.onresult=(ev)=>{
+      let ft='',it='';
       for(let i=0;i<ev.results.length;i++){
-        text += ev.results[i][0].transcript;
+        const re=ev.results[i];
+        if(re.isFinal)ft+=re[0].transcript;else it+=re[0].transcript;
       }
-      text = text.trim();
-      if(text && text.length > 1){
-        tx.value = text;
-        vsRes.textContent = text;
-        vsText.textContent = '✅ 听到了！';
-        setTimeout(function(){
-          vs.classList.remove('show');
-          sendText();
-        }, 600);
-      } else {
-        vsText.textContent = '没听清，请再说一次';
-        setTimeout(function(){ vs.classList.remove('show'); }, 1500);
+      const result=ft||it;
+      const text=result.trim();
+      if(text.length>1){
+        tx.value=text;
+        vsRes.textContent=text;
+        vsText.textContent='✅ 听到了！';
+        safeStop();
+        setTimeout(()=>{vs.classList.remove('show');sendText();},400);
       }
-      vb.classList.remove('rec');
-      vb.textContent = '🎤';
     };
 
-    r.onerror = function(e){
-      vb.classList.remove('rec');
-      vb.textContent = '🎤';
-      if(e.error === 'no-speech'){
-        vsText.textContent = '没有听到声音哦～';
-      } else if(e.error === 'aborted'){
-        vsText.textContent = '';
-      } else if(e.error === 'not-allowed'){
-        vsText.textContent = '请在设置中允许麦克风';
-        vsRes.textContent = '设置 > Safari > 麦克风 > 允许';
-      } else {
-        vsText.textContent = '语音失败了，请打字吧';
+    r.onerror=(e)=>{
+      const err=e.error;
+      if(err==='aborted'){
+        safeStop();
+        vs.classList.remove('show');
+      }else if(err==='no-speech'){
+        vsText.textContent='没听到声音～';
+        safeStop();
+        setTimeout(()=>vs.classList.remove('show'),1200);
+      }else if(err==='not-allowed'){
+        vsText.textContent='麦克风权限被拒绝 ❌';
+        vsRes.textContent='请打开：设置 → Safari → 允许麦克风';
+        safeStop();
+        setTimeout(()=>vs.classList.remove('show'),3000);
+      }else if(err==='audio-capture'){
+        vsText.textContent='找不到麦克风';
+        safeStop();
+        setTimeout(()=>vs.classList.remove('show'),2000);
+      }else if(err==='network'){
+        vsText.textContent='网络问题，请重试';
+        safeStop();
+        setTimeout(()=>vs.classList.remove('show'),2000);
+      }else{
+        vsText.textContent='语音失败: '+err;
+        safeStop();
+        setTimeout(()=>vs.classList.remove('show'),2000);
       }
-      setTimeout(function(){ vs.classList.remove('show'); }, 2000);
     };
 
-    r.onspeechstart = function(){
-      vsText.textContent = '正在听…';
-      vsRes.textContent = '';
+    r.onend=()=>{
+      // onend 在 onresult 之后触发，检查是否有文字输入
+      if(!tx.value.trim()){
+        safeStop();
+      }
     };
 
-    r.onend = function(){
-      vb.classList.remove('rec');
-      vb.textContent = '🎤';
-    };
-
-    return r;
+    try{
+      isActive=true;
+      vb.classList.add('rec');
+      vb.textContent='🔴';
+      r.start();
+    }catch(ex){
+      vsText.textContent='请先允许麦克风';
+      vsRes.textContent='';
+      safeStop();
+      setTimeout(()=>vs.classList.remove('show'),2000);
+    }
   }
 
-  // 单击按钮 → 开始录音
-  vb.onclick = function(e){
+  // 单击开始，再单击停止
+  vb.onclick=(e)=>{
     e.preventDefault();
     e.stopPropagation();
 
-    if(vb.classList.contains('rec')){
-      // 正在录，点一下停止
-      if(rec){ try{rec.stop();}catch(ex){} }
-      vb.classList.remove('rec');
-      vb.textContent = '🎤';
+    if(isActive){
+      // 停止
+      safeStop();
       vs.classList.remove('show');
-      return;
-    }
-
-    // 创建新实例并开始
-    vs.classList.add('show');
-    vsText.textContent = '正在听…';
-    vsRes.textContent = '';
-    vb.classList.add('rec');
-    vb.textContent = '🔴';
-
-    rec = createRecognition();
-    try {
-      rec.start();
-    } catch(ex){
-      vb.classList.remove('rec');
-      vb.textContent = '🎤';
-      vsText.textContent = '请先允许麦克风';
-      vsRes.textContent = '设置 > Safari > 麦克风';
-      setTimeout(function(){ vs.classList.remove('show'); }, 2000);
+      if(tx.value.trim()){
+        setTimeout(()=>sendText(),100);
+      }
+    }else{
+      // 开始
+      vs.classList.add('show');
+      vsText.textContent='准备录音…';
+      vsRes.textContent='';
+      safeStart();
     }
   };
 
-  console.log('✅ 语音就绪 (iOS 单击模式)');
+  console.log('✅ 语音就绪 (iOS)');
 }
 
 // ===== 萌可选择 =====
