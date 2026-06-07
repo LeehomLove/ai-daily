@@ -375,7 +375,7 @@ async function call(extra,inst,wChoices){
 
   const w=WORLDS[cw];
   const chH=wChoices?'\n\n回复末尾用 ###CHOICES### 标记2-3个选项':'';
-  const sp=`${cm.p}\n\n你在:${w.p}\n\n规则:\n1. 回复2-4句话\n2. 用emoji\n3. 像5-10岁好朋友说话\n4. 鼓励小朋友\n5. 偶尔送⭐作为礼物\n6. 这是第${cw+1}/${WORLDS.length}个世界\n7. 直接回应小朋友说的话，不要重复前面\n8. 你的名字是${cm.e}${cm.name}，自然融入角色${chH}\n禁止成人/暴力/AI相关内容。`;
+  const sp=`${cm.p}\n\n你在:${w.p}\n\n规则:\n1. 回复2-4句话\n2. 用emoji\n3. 像5-10岁好朋友说话\n4. 鼓励小朋友\n5. 偶尔送⭐作为礼物\n6. 这是第${cw+1}/${WORLDS.length}个世界\n7. 直接回应小朋友说的话，不要重复前面\n8. 你的名字是${cm.e}${cm.name}，自然融入角色${chH}\n用纯中文回复！禁止使用任何其他语言，禁止韩文、英文、日文。禁止成人/暴力/AI相关内容。`;
 
   const msgs=[{role:'system',content:sp},...ms.slice(-8).map(m=>({role:m.r==='a'?'assistant':'user',content:m.c}))];
   if(inst)msgs.push({role:'user',content:inst});
