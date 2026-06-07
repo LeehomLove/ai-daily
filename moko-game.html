@@ -17,8 +17,6 @@
     touch-action: manipulation; -webkit-tap-highlight-color: transparent;
     user-select: none; -webkit-user-select: none;
   }
-
-  /* 漂浮星星背景 */
   .bg-stars {
     position: fixed; inset:0; pointer-events:none; z-index:0;
     background-image:
@@ -46,11 +44,7 @@
     85% { opacity:0.2; }
     100% { transform: translateY(-100px) rotate(50deg) scale(0.2); opacity:0; }
   }
-
-  /* 主容器 */
   .main { position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; min-height:100vh; padding:0 14px var(--safe-bottom) 14px; }
-
-  /* 标题 */
   .title-row { text-align:center; padding:14px 0 2px; }
   .title-emoji { font-size:36px; animation: bounce 1s ease infinite; display:block; }
   @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
@@ -59,22 +53,12 @@
     -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
   }
   .title-sub { font-size:12px; color:#ce93d8; }
-
-  /* 关卡标签 */
-  .level-tag {
-    font-size:13px; font-weight:700; padding:4px 14px; border-radius:15px;
-    background:linear-gradient(135deg, #f48fb1, #ce93d8); color:#fff;
-    margin-top:4px; display:inline-block;
-  }
-
-  /* 分数栏 */
+  .level-tag { font-size:13px; font-weight:700; padding:4px 14px; border-radius:15px; background:linear-gradient(135deg, #f48fb1, #ce93d8); color:#fff; margin-top:4px; display:inline-block; }
   .score-bar { display:flex; gap:18px; align-items:center; padding:10px 22px; background:rgba(255,255,255,.75); backdrop-filter:blur(10px); border-radius:28px; margin:6px 0; box-shadow:0 2px 12px rgba(156,39,176,.08); }
   .score-item { display:flex; align-items:center; gap:5px; font-size:14px; font-weight:700; }
   .score-num { font-size:20px; background:linear-gradient(135deg, #ec407a, #f48fb1); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
   .combo-txt { font-size:12px; color:#ab47bc; font-weight:600; min-width:50px; text-align:center; }
   .target-txt { font-size:12px; color:#7b1fa2; }
-
-  /* 游戏区 */
   .game-area {
     position:relative; width:100%; max-width:400px; flex:1; min-height:380px;
     border-radius:28px; background:linear-gradient(180deg, rgba(255,255,255,.3) 0%, rgba(255,255,255,.1) 100%);
@@ -82,17 +66,11 @@
   }
   .game-area::after { content:''; position:absolute; bottom:0; left:0; right:0; height:50px; background:linear-gradient(0deg, rgba(129,199,132,.2) 0%, transparent 100%); border-radius:0 0 28px 28px; pointer-events:none; z-index:0; }
   .grass { position:absolute; bottom:6px; left:0; right:0; text-align:center; font-size:22px; pointer-events:none; z-index:0; letter-spacing:3px; opacity:.6; }
-
-  /* 计时器 */
   .timer-wrap { position:absolute; top:10px; right:10px; width:44px; height:44px; border-radius:50%; background:conic-gradient(#ec407a var(--prog,100%), rgba(255,255,255,.25) 0deg); display:flex; align-items:center; justify-content:center; z-index:10; }
   .timer-inr { width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.85); display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:900; color:#ec407a; }
-
-  /* 进度条 */
   .progress-wrap { position:absolute; top:10px; left:10px; right:64px; height:18px; background:rgba(255,255,255,.5); border-radius:9px; overflow:hidden; z-index:10; }
   .progress-bar { height:100%; border-radius:9px; background:linear-gradient(90deg, #f48fb1, #ce93d8, #ab47bc); transition:width .3s; width:0%; }
   .progress-label { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#7b1fa2; }
-
-  /* 萌可（CSS绘制） */
   .moko {
     position:absolute; z-index:5; cursor:pointer;
     animation: popIn .35s cubic-bezier(.68,-.55,.27,1.55);
@@ -104,39 +82,19 @@
   .moko.popping { animation:popOut .3s ease forwards; pointer-events:none; }
   @keyframes popOut { 0%{transform:scale(1); opacity:1} 50%{transform:scale(1.5) rotate(10deg); opacity:.6} 100%{transform:scale(0) rotate(-30deg); opacity:0} }
 
-  /* CSS萌可脸 */
-  .moko-face {
-    width:64px; height:64px; border-radius:50%; position:relative;
-    display:flex; align-items:center; justify-content:center;
-    transition:transform .15s;
-  }
-  .moko-face::before,
-  .moko-face::after { content:''; position:absolute; width:7px; height:7px; border-radius:50%; top:22px; }
-  .moko-face::before { left:16px; }
-  .moko-face::after { right:16px; }
-  .moko-mouth { position:absolute; bottom:14px; font-size:0px; }
-  .moko-blush { position:absolute; width:10px; height:6px; border-radius:50%; top:28px; opacity:.5; }
-  .moko-blush.left { left:7px; }
-  .moko-blush.right { right:7px; }
+  /* 用不到的旧CSS保留但不影响 */
   .moko-name { font-size:10px; font-weight:700; margin-top:2px; text-align:center; white-space:nowrap; }
-  .moko-crown { position:absolute; top:-14px; left:50%; transform:translateX(-50%); font-size:16px; }
-
-  /* 分数飘出 */
   .score-pop { position:absolute; pointer-events:none; font-size:18px; font-weight:900; z-index:20; animation:scFloat .7s ease-out forwards; }
   @keyframes scFloat { 0%{transform:translateY(0) scale(.5); opacity:1} 100%{transform:translateY(-60px) scale(1.2); opacity:0} }
-  /* 粒子 */
   .particle { position:absolute; pointer-events:none; font-size:12px; z-index:18; animation:pBurst .5s ease-out forwards; }
   @keyframes pBurst { 0%{transform:translate(0,0) scale(1);opacity:1} 100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0} }
-
-  /* 按钮 */
   .btn-row { display:flex; gap:10px; margin-bottom:4px; flex-wrap:wrap; justify-content:center; }
   .btn { padding:11px 22px; border-radius:22px; border:none; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; letter-spacing:1px; transition:all .15s; box-shadow:0 3px 12px rgba(156,39,176,.15); }
   .btn:active { transform:scale(.94); }
   .btn-start { background:linear-gradient(135deg, #f48fb1, #ce93d8); color:#fff; font-size:17px; padding:13px 34px; }
+  .btn-stop { background:linear-gradient(135deg, #ff8a80, #ff5252); color:#fff; font-size:17px; padding:13px 34px; display:none; }
   .btn-lv { background:rgba(255,255,255,.75); color:#7b1fa2; font-size:13px; padding:9px 16px; }
   .btn-lv.active { background:#ce93d8; color:#fff; }
-
-  /* 弹窗 */
   .modal-overlay { position:fixed; inset:0; z-index:100; background:rgba(0,0,0,.25); display:flex; align-items:center; justify-content:center; animation:fadeIn .25s; }
   @keyframes fadeIn { from{opacity:0} to{opacity:1} }
   .modal { background:#fff; border-radius:24px; padding:26px 22px; text-align:center; max-width:290px; width:90%; box-shadow:0 20px 60px rgba(156,39,176,.2); animation:mPop .4s cubic-bezier(.68,-.55,.27,1.55); }
@@ -146,25 +104,30 @@
   .modal .r-score { font-size:32px; font-weight:900; background:linear-gradient(135deg, #ec407a, #ab47bc); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
   .modal .r-stars { font-size:13px; color:#999; margin:2px 0 12px; }
   .modal .btn { margin:0 3px; }
-
-  /* 提示 */
   .hint-box { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; color:#ce93d8; font-size:14px; z-index:2; pointer-events:none; }
   .hint-box .icon { font-size:44px; }
-
-  /* 关卡过关特效 */
-  .level-clear { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; z-index:15; pointer-events:none; animation:celebrate .5s ease forwards; }
+  .level-clear { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; z-index:15; pointer-events:none; }
   .level-clear .big-text { font-size:36px; font-weight:900; color:#7b1fa2; text-shadow:0 2px 10px rgba(156,39,176,.3); }
+  .music-btn {
+    position:fixed; bottom:20px; right:20px; z-index:200;
+    width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,.85);
+    border:none; font-size:22px; cursor:pointer;
+    box-shadow:0 4px 16px rgba(156,39,176,.2);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .music-btn:active { transform:scale(.9); }
 </style>
 </head>
 <body>
 <div class="bg-stars"></div>
 
+<button class="music-btn" id="musicBtn" onclick="toggleMusic()" title="音乐">🔇</button>
+
 <script>
-// 漂浮装饰
-const deco = ['✨','⭐','💖','🌸','💫','🌟','🪄','🎀','💝','🧸','🍬','🍭'];
+const decoList = ['✨','⭐','💖','🌸','💫','🌟','🪄','🎀','💝','🧸','🍬','🍭'];
 for(let i=0;i<22;i++) {
   const el=document.createElement('span');
-  el.className='float-el'; el.textContent=deco[i%deco.length];
+  el.className='float-el'; el.textContent=decoList[i%decoList.length];
   el.style.cssText=`left:${Math.random()*90}%;top:${55+Math.random()*40}%;--dur:${4+Math.random()*7}s;--delay:${Math.random()*6}s;--sz:${9+Math.random()*13}px`;
   document.body.appendChild(el);
 }
@@ -177,14 +140,12 @@ for(let i=0;i<22;i++) {
     <div class="title-sub" id="subtitle">点击萌可，收集爱心 ✨</div>
     <div class="level-tag" id="levelTag">第 1 关</div>
   </div>
-
   <div class="score-bar">
     <div class="score-item">💖 <span class="score-num" id="score">0</span></div>
     <div class="score-item">🎯 <span class="target-txt" id="target">目标: 30</span></div>
     <div class="score-item">🔥 <span class="combo-txt" id="combo"></span></div>
     <div class="score-item">🏆 <span class="score-num" id="best">0</span></div>
   </div>
-
   <div class="game-area" id="gameArea">
     <div class="grass">🌿🌱🌼🌿🌸🌱🌼🌿🌱🌿</div>
     <div class="progress-wrap">
@@ -197,9 +158,9 @@ for(let i=0;i<22;i++) {
       <div>点我开始游戏</div>
     </div>
   </div>
-
   <div class="btn-row">
     <button class="btn btn-start" id="btnStart" onclick="startGame()">🎮 开始游戏</button>
+    <button class="btn btn-stop" id="btnStop" onclick="stopGame()">⏹ 停止</button>
   </div>
   <div class="btn-row" style="margin-bottom:12px">
     <button class="btn btn-lv active" onclick="setLevel('easy')">🌸 简单</button>
@@ -209,131 +170,175 @@ for(let i=0;i<22;i++) {
 </div>
 
 <script>
-// ===== 萌可定义 - 本地图片（已上传到GitHub Pages同目录） =====
+// ===== 萌可图片 =====
 const BASE = 'https://leehomlove.github.io/ai-daily/';
-const REAL_IMGS = [
-  BASE + 'moko1.jpg',
-  BASE + 'moko2.jpg',
-  BASE + 'moko3.jpg',
-  BASE + 'moko4.jpg',
-];
+const IMG = [BASE+'moko1.jpg',BASE+'moko2.jpg',BASE+'moko3.jpg',BASE+'moko4.jpg',
+  BASE+'moko5.jpg',BASE+'moko6.jpg',BASE+'moko7.jpg',BASE+'moko8.jpg',
+  BASE+'moko9.jpg',BASE+'moko10.jpg',BASE+'moko11.jpg'];
 
 const MOKO_DEFS = [
-  { id:'heart',  name:'爱心萌可', img:REAL_IMGS[0], color:'#ff4081', points:3, rare:false },
-  { id:'courage',name:'勇气萌可', img:REAL_IMGS[1], color:'#ef6c00', points:2, rare:false },
-  { id:'happy',  name:'幸福萌可', img:REAL_IMGS[2], color:'#f9a825', points:2, rare:false },
-  { id:'green',  name:'盼盼萌可', img:REAL_IMGS[3], color:'#2e7d32', points:2, rare:false },
-  { id:'g1',     name:'正正萌可', img:REAL_IMGS[1], color:'#1565c0', points:3, rare:false },
-  { id:'g2',     name:'唱唱萌可', img:REAL_IMGS[3], color:'#c2185b', points:2, rare:false },
-  { id:'g3',     name:'乐乐萌可', img:REAL_IMGS[0], color:'#ff6f00', points:3, rare:false },
-  { id:'princess',name:'萌可公主',img:REAL_IMGS[2], color:'#8e24aa', points:8, rare:true },
-  { id:'unicorn',name:'独角萌可', img:REAL_IMGS[3], color:'#4527a0', points:5, rare:true },
-  { id:'g4',     name:'甜心萌可', img:REAL_IMGS[1], color:'#ad1457', points:3, rare:false },
-  { id:'g5',     name:'阳光萌可', img:REAL_IMGS[0], color:'#ffab00', points:2, rare:false },
-  { id:'g6',     name:'笑笑萌可', img:REAL_IMGS[2], color:'#e91e63', points:2, rare:false },
+  { name:'爱心萌可', img:IMG[0], color:'#ff4081', pts:3 },
+  { name:'勇气萌可', img:IMG[1], color:'#ef6c00', pts:2 },
+  { name:'幸福萌可', img:IMG[2], color:'#f9a825', pts:2 },
+  { name:'盼盼萌可', img:IMG[3], color:'#2e7d32', pts:2 },
+  { name:'正正萌可', img:IMG[4], color:'#1565c0', pts:3 },
+  { name:'唱唱萌可', img:IMG[5], color:'#c2185b', pts:2 },
+  { name:'乐乐萌可', img:IMG[6], color:'#ff6f00', pts:3 },
+  { name:'笑笑萌可', img:IMG[7], color:'#e91e63', pts:2 },
+  { name:'甜心萌可', img:IMG[8], color:'#ad1457', pts:3 },
+  { name:'阳光萌可', img:IMG[9], color:'#ffab00', pts:2 },
+  { name:'独角萌可', img:IMG[10],color:'#4527a0', pts:5, rare:true },
+  { name:'萌可公主', img:IMG[2], color:'#8e24aa', pts:8, rare:true },
 ];
 
-// ===== 关卡系统 =====
 const LEVELS = [
-  { round:1, name:'第 1 关 · 初遇萌可', target:15, time:45, interval:1600, max:3, rareRate:0,   intro:'收集 15 颗爱心，认识萌可们吧！' },
-  { round:2, name:'第 2 关 · 萌可增多', target:25, time:45, interval:1300, max:4, rareRate:0,   intro:'这次来了更多萌可哦～' },
-  { round:3, name:'第 3 关 · 稀有萌可', target:30, time:50, interval:1200, max:5, rareRate:0.06,intro:'有稀有萌可出现！抓住它们～' },
-  { round:4, name:'第 4 关 · 萌可派对', target:30, time:55, interval:1050, max:5, rareRate:0.08,intro:'萌可越来越多啦！加油！' },
-  { round:5, name:'第 5 关 · 萌可盛宴', target:40, time:60, interval:900,  max:6, rareRate:0.10,intro:'最后一关！你能收集多少？' },
+  { nm:'第 1 关 · 初遇萌可', tgt:12, time:40, iv:1700, max:3, rr:0,    intro:'收集 12 颗爱心，认识萌可们吧！' },
+  { nm:'第 2 关 · 萌可增多', tgt:20, time:45, iv:1400, max:4, rr:0,    intro:'这次来了更多萌可哦～' },
+  { nm:'第 3 关 · 稀有萌可', tgt:25, time:50, iv:1250, max:5, rr:0.06, intro:'有稀有萌可出现！抓住它们～' },
+  { nm:'第 4 关 · 萌可派对', tgt:30, time:55, iv:1100, max:5, rr:0.08, intro:'萌可越来越多啦！加油！' },
+  { nm:'第 5 关 · 萌可盛宴', tgt:35, time:60, iv:950,  max:6, rr:0.10, intro:'最后一关！你能收集多少？' },
 ];
 
-const DIFFICULTY = {
-  easy:   { timeMult:1.3, intervalMult:1.3, maxBonus:0, label:'简单 🌸' },
-  normal: { timeMult:1.0, intervalMult:1.0, maxBonus:0, label:'普通 ⭐' },
-  hard:   { timeMult:0.8, intervalMult:0.75, maxBonus:1, label:'困难 🔥' },
+const DIFF = {
+  easy:   { tm:1.4, im:1.3, mb:0, label:'简单 🌸' },
+  normal: { tm:1.0, im:1.0, mb:0, label:'普通 ⭐' },
+  hard:   { tm:0.75,im:0.75,mb:1, label:'困难 🔥' },
 };
 
-let currentLevel = 0;
-let difficulty = 'normal';
-let score=0, targetScore=0, combo=0, bestCombo=0;
-let gameRunning=false, gameTimer=null, spawnTimer=null;
-let timeLeft=0, gameDuration=0, spawnInterval=0, maxMokos=0, rareRate=0;
-let activeMokos=[], bestScore=0, levelBestCombo=0;
+let lv=0, diff='normal', score=0, tgt=0, combo=0, bestCombo=0, lvBestCombo=0;
+let running=false, gTimer=null, sTimer=null;
+let timeLeft=0, gDur=0, sInterval=0, maxMokos=0, rareRate=0;
+let active=[], bestScore=0;
+let musicPlaying=false, musicCtx=null, musicGain=null;
 
-const ga=document.getElementById('gameArea');
-const se=document.getElementById('score');
-const ce=document.getElementById('combo');
-const be=document.getElementById('best');
-const he=document.getElementById('hintBox');
-const tt=document.getElementById('timerText');
-const bs=document.getElementById('btnStart');
-const proBar=document.getElementById('progressBar');
-const proLabel=document.getElementById('progressLabel');
-const lvTag=document.getElementById('levelTag');
-const subEl=document.getElementById('subtitle');
-const targetEl=document.getElementById('target');
+const ga=document.getElementById('gameArea'), se=document.getElementById('score');
+const ce=document.getElementById('combo'), be=document.getElementById('best');
+const he=document.getElementById('hintBox'), tt=document.getElementById('timerText');
+const bs=document.getElementById('btnStart'), bStop=document.getElementById('btnStop');
+const proBar=document.getElementById('progressBar'), proLabel=document.getElementById('progressLabel');
+const lvTag=document.getElementById('levelTag'), subEl=document.getElementById('subtitle');
+const targetEl=document.getElementById('target'), musicBtn=document.getElementById('musicBtn');
 
-bestScore=parseInt(localStorage.getItem('moko_best2')||'0');
-be.textContent=bestScore;
+bestScore=parseInt(localStorage.getItem('moko_best3')||'0'); be.textContent=bestScore;
 
-function setLevel(d) {
-  if(gameRunning) return;
-  difficulty=d;
-  document.querySelectorAll('.btn-lv').forEach(b=>b.classList.remove('active'));
-  event.target.classList.add('active');
+function setLevel(d){ if(running)return; diff=d; document.querySelectorAll('.btn-lv').forEach(b=>b.classList.remove('active')); event.target.classList.add('active'); }
+
+function initLv(){
+  const L=LEVELS[lv], D=DIFF[diff];
+  tgt=L.tgt; gDur=Math.round(L.time*D.tm); sInterval=Math.round(L.iv*D.im);
+  maxMokos=L.max+D.mb; rareRate=L.rr;
+  lvTag.textContent=L.nm; subEl.textContent=L.intro;
+  targetEl.textContent='目标: '+tgt;
 }
 
-function buildLevel() {
-  const lv=LEVELS[currentLevel];
-  const df=DIFFICULTY[difficulty];
-  targetScore=lv.target;
-  gameDuration=Math.round(lv.time*df.timeMult);
-  spawnInterval=Math.round(lv.interval*df.intervalMult);
-  maxMokos=lv.max+df.maxBonus;
-  rareRate=lv.rareRate;
-  lvTag.textContent=lv.name;
-  subEl.textContent=lv.intro;
-  targetEl.textContent='目标: '+targetScore;
+// ===== 音乐系统 - 用Web Audio API生成简单的萌可风格旋律 =====
+function initMusic(){
+  if(musicCtx) return;
+  try {
+    musicCtx = new (window.AudioContext||window.webkitAudioContext)();
+    musicGain = musicCtx.createGain();
+    musicGain.gain.value = 0.08;
+    musicGain.connect(musicCtx.destination);
+  } catch(e){}
 }
 
-function startGame() {
-  ga.querySelectorAll('.moko,.score-pop,.particle,.level-clear').forEach(el=>el.remove());
-  score=0; combo=0; bestCombo=0; levelBestCombo=0; activeMokos=[];
-  currentLevel=0; buildLevel();
-  timeLeft=gameDuration;
-  se.textContent='0'; ce.textContent=''; he.style.display='none';
-  tt.textContent=timeLeft; tt.style.color='#ec407a';
-  const tw=ga.querySelector('.timer-wrap'); tw.style.setProperty('--prog','100%');
-  proBar.style.width='0%'; proLabel.textContent='0 / '+targetScore;
-  bs.textContent='🎮 游戏中...'; bs.style.opacity='0.7';
-  gameRunning=true;
+function playNote(freq, start, dur){
+  if(!musicCtx||!musicPlaying) return;
+  try {
+    const osc = musicCtx.createOscillator();
+    const g = musicCtx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.value = freq;
+    g.gain.setValueAtTime(0.06, start);
+    g.gain.exponentialRampToValueAtTime(0.001, start+dur);
+    osc.connect(g); g.connect(musicGain);
+    osc.start(start); osc.stop(start+dur);
+  } catch(e){}
+}
 
-  gameTimer=setInterval(()=>{
+// 萌可风格简单旋律循环
+const melodyNotes = [
+  523,587,659,698,784,880,988,  // C D E F G A B
+  784,698,659,587,523,440,392,349,
+];
+let musicTid=null;
+
+function startMusic(){
+  if(musicPlaying) return;
+  initMusic();
+  if(!musicCtx) return;
+  musicPlaying=true; musicBtn.textContent='🔊';
+  let noteIdx=0, beat=0;
+
+  function loop(){
+    if(!musicPlaying) return;
+    const now = musicCtx.currentTime;
+    // 简单旋律
+    if(beat%2===0) playNote(melodyNotes[noteIdx%melodyNotes.length], now, 0.25);
+    if(beat%4===0) playNote(melodyNotes[(noteIdx+4)%melodyNotes.length]*0.5, now, 0.4);
+    noteIdx++; beat++;
+    musicTid=setTimeout(loop, 300);
+  }
+  loop();
+}
+
+function stopMusic(){
+  musicPlaying=false; musicBtn.textContent='🔇';
+  if(musicTid){ clearTimeout(musicTid); musicTid=null; }
+}
+
+function toggleMusic(){
+  if(musicPlaying) stopMusic(); else startMusic();
+}
+
+// ===== 游戏逻辑 =====
+function startGame(){
+  stopGame(); // clean first
+  ga.querySelectorAll('.moko,.score-pop,.particle,.level-clear').forEach(e=>e.remove());
+  score=0;combo=0;bestCombo=0;lvBestCombo=0;active=[];lv=0;
+  initLv(); timeLeft=gDur;
+  se.textContent='0';ce.textContent='';he.style.display='none';
+  tt.textContent=timeLeft;tt.style.color='#ec407a';
+  ga.querySelector('.timer-wrap').style.setProperty('--prog','100%');
+  proBar.style.width='0%';proLabel.textContent='0 / '+tgt;
+  bs.textContent='🎮 游戏中...';bs.style.opacity='0.7';
+  bStop.style.display='inline-block';
+  running=true;
+
+  gTimer=setInterval(()=>{
     timeLeft--;
     tt.textContent=timeLeft;
-    const tw=ga.querySelector('.timer-wrap'); tw.style.setProperty('--prog',(timeLeft/gameDuration*100)+'%');
+    ga.querySelector('.timer-wrap').style.setProperty('--prog',(timeLeft/gDur*100)+'%');
     if(timeLeft<=5) tt.style.color='#e53935';
     if(timeLeft<=0) endGame(false);
   },1000);
 
-  spawnMoko();
-  spawnTimer=setInterval(()=>{ if(activeMokos.length<maxMokos) spawnMoko(); },spawnInterval);
+  spawnOne();
+  sTimer=setInterval(()=>{ if(active.length<maxMokos) spawnOne(); },sInterval);
 }
 
-function spawnMoko() {
-  if(!gameRunning) return;
+function stopGame(){
+  if(!running) return;
+  running=false;
+  clearInterval(gTimer); clearInterval(sTimer); gTimer=null; sTimer=null;
+  ga.querySelectorAll('.moko').forEach(e=>{ e.classList.add('popping'); setTimeout(()=>e.remove(),300); });
+  active=[];
+  bs.textContent='🎮 开始游戏'; bs.style.opacity='1';
+  bStop.style.display='none'; tt.style.color='#ec407a';
+}
+
+function spawnOne(){
+  if(!running) return;
   let def;
-  if(Math.random()<rareRate) {
+  if(Math.random()<rareRate){
     const rare=MOKO_DEFS.filter(d=>d.rare);
     def=rare[Math.floor(Math.random()*rare.length)];
-  } else {
-    const normal=MOKO_DEFS.filter(d=>!d.rare);
-    def=normal[Math.floor(Math.random()*normal.length)];
+  }else{
+    const norm=MOKO_DEFS.filter(d=>!d.rare);
+    def=norm[Math.floor(Math.random()*norm.length)];
   }
 
-  const el=document.createElement('div');
-  el.className='moko';
-  el.dataset.points=def.points;
-  el.dataset.color=def.color;
-  el.dataset.name=def.name;
-  el.dataset.rare=def.rare?'1':'0';
-
-  // 绘制萌可用真实图片
+  const el=document.createElement('div'); el.className='moko';
   const sz=def.rare?72:58;
   el.innerHTML=`
     <img src="${def.img}" style="width:${sz}px;height:${sz}px;border-radius:50%;object-fit:cover;border:3px solid ${def.color};box-shadow:0 4px 12px rgba(0,0,0,.15);display:block;" alt="${def.name}">
@@ -346,27 +351,25 @@ function spawnMoko() {
   el.style.top=(20+Math.random()*(ah-150))+'px';
   if(def.rare) el.style.zIndex='6';
 
-  el.addEventListener('pointerdown',(e)=>{ e.preventDefault(); tapMoko(el,def.points,def.color,def.name); });
-  ga.appendChild(el);
-  activeMokos.push(el);
+  el.addEventListener('pointerdown',(e)=>{ e.preventDefault(); tap(el,def.pts,def.color); });
+  ga.appendChild(el); active.push(el);
 
-  const lifetime=def.rare?4000:2500+Math.random()*1500;
+  const life=def.rare?4000:2500+Math.random()*1500;
   setTimeout(()=>{
-    if(el.parentNode&&gameRunning){ el.classList.add('popping'); setTimeout(()=>{el.remove();activeMokos=activeMokos.filter(m=>m!==el);},300); combo=0; ce.textContent=''; }
-  },lifetime);
+    if(el.parentNode&&running){ el.classList.add('popping'); setTimeout(()=>{el.remove();active=active.filter(m=>m!==el);},300); combo=0;ce.textContent=''; }
+  },life);
 }
 
-function tapMoko(el,points,color,name) {
-  if(!gameRunning||el.classList.contains('popping')) return;
+function tap(el,pts,color){
+  if(!running||el.classList.contains('popping')) return;
   el.classList.add('popping');
 
-  combo++; if(combo>bestCombo) bestCombo=combo; if(combo>levelBestCombo) levelBestCombo=combo;
+  combo++; if(combo>bestCombo) bestCombo=combo; if(combo>lvBestCombo) lvBestCombo=combo;
   const bonus=Math.min(combo-1,5);
-  const earned=points+bonus;
-  score+=earned;
-  se.textContent=score;
-  const pct=Math.min(100,Math.round(score/targetScore*100));
-  proBar.style.width=pct+'%'; proLabel.textContent=score+' / '+targetScore;
+  const earned=pts+bonus;
+  score+=earned; se.textContent=score;
+  const pct=Math.min(100,Math.round(score/tgt*100));
+  proBar.style.width=pct+'%';proLabel.textContent=score+' / '+tgt;
 
   if(combo>=3){ ce.textContent=combo+'连击!🎉'; ce.style.transform='scale(1.2)'; setTimeout(()=>ce.style.transform='scale(1)',150); }
 
@@ -375,83 +378,61 @@ function tapMoko(el,points,color,name) {
   if(earned>=8) pop.style.fontSize='26px';
   ga.appendChild(pop); setTimeout(()=>pop.remove(),700);
 
-  const pts=['✨','💫','🌟','⭐','💖','🎀','🌸','💝'];
-  for(let i=0;i<8;i++){ const p=document.createElement('div'); p.className='particle'; p.textContent=pts[i]; p.style.left=el.style.left; p.style.top=el.style.top; p.style.setProperty('--dx',(Math.random()*70-35)+'px'); p.style.setProperty('--dy',(Math.random()*-70-15)+'px'); ga.appendChild(p); setTimeout(()=>p.remove(),500); }
+  const ptsArr=['✨','💫','🌟','⭐','💖','🎀','🌸','💝'];
+  for(let i=0;i<8;i++){ const p=document.createElement('div'); p.className='particle'; p.textContent=ptsArr[i]; p.style.left=el.style.left; p.style.top=el.style.top; p.style.setProperty('--dx',(Math.random()*70-35)+'px'); p.style.setProperty('--dy',(Math.random()*-70-15)+'px'); ga.appendChild(p); setTimeout(()=>p.remove(),500); }
 
   if(navigator.vibrate) navigator.vibrate(earned>=5?15:8);
 
-  setTimeout(()=>{ el.remove(); activeMokos=activeMokos.filter(m=>m!==el); },300);
+  setTimeout(()=>{ el.remove(); active=active.filter(m=>m!==el); },300);
 
-  // 检查是否过关
-  if(score>=targetScore) {
-    if(currentLevel<LEVELS.length-1) {
-      // 下一关
-      goNextLevel();
-    } else {
-      // 全部通关
-      endGame(true);
-    }
+  if(score>=tgt){
+    if(lv<LEVELS.length-1){ goNext(); }else{ endGame(true); }
   }
 }
 
-function goNextLevel() {
-  // 短暂展示过关效果
-  gameRunning=false; clearInterval(spawnTimer); spawnTimer=null;
-  ga.querySelectorAll('.moko').forEach(el=>{ el.classList.add('popping'); setTimeout(()=>el.remove(),300); });
-  activeMokos=[];
-
-  const clearDiv=document.createElement('div');
-  clearDiv.className='level-clear';
-  clearDiv.innerHTML=`<div class="big-text">🎉 过关啦！</div><div style="color:#ab47bc;font-size:16px;margin-top:4px;">准备下一关…</div>`;
-  ga.appendChild(clearDiv);
+function goNext(){
+  running=false; clearInterval(sTimer); sTimer=null;
+  ga.querySelectorAll('.moko').forEach(e=>{ e.classList.add('popping'); setTimeout(()=>e.remove(),300); });
+  active=[];
+  const cd=document.createElement('div'); cd.className='level-clear';
+  cd.innerHTML='<div class="big-text">🎉 过关啦！</div><div style="color:#ab47bc;margin-top:4px;">准备下一关…</div>';
+  ga.appendChild(cd);
 
   setTimeout(()=>{
-    clearDiv.remove();
-    currentLevel++;
-    buildLevel();
-    timeLeft=gameDuration; tt.textContent=timeLeft; tt.style.color='#ec407a';
-    proBar.style.width='0%'; proLabel.textContent='0 / '+targetScore;
-    combo=0; ce.textContent=''; levelBestCombo=0;
-    gameRunning=true;
-    spawnMoko();
-    spawnTimer=setInterval(()=>{ if(activeMokos.length<maxMokos) spawnMoko(); },spawnInterval);
+    cd.remove(); lv++; initLv(); timeLeft=gDur;
+    tt.textContent=timeLeft;tt.style.color='#ec407a';
+    proBar.style.width='0%';proLabel.textContent='0 / '+tgt;
+    combo=0;ce.textContent='';lvBestCombo=0;
+    running=true;
+    spawnOne();
+    sTimer=setInterval(()=>{ if(active.length<maxMokos) spawnOne(); },sInterval);
   },1500);
 }
 
-function endGame(allClear) {
-  gameRunning=false; clearInterval(gameTimer); clearInterval(spawnTimer); gameTimer=null; spawnTimer=null;
-  ga.querySelectorAll('.moko').forEach(el=>{ el.classList.add('popping'); setTimeout(()=>el.remove(),300); });
-  activeMokos=[]; bs.textContent='🔄 再来一次'; bs.style.opacity='1'; tt.style.color='#ec407a';
-  if(score>bestScore){ bestScore=score; localStorage.setItem('moko_best2',bestScore); be.textContent=bestScore; }
+function endGame(allClear){
+  running=false; clearInterval(gTimer); clearInterval(sTimer); gTimer=null; sTimer=null;
+  ga.querySelectorAll('.moko').forEach(e=>{ e.classList.add('popping'); setTimeout(()=>e.remove(),300); });
+  active=[];
+  bs.textContent='🔄 再来一次'; bs.style.opacity='1';
+  bStop.style.display='none'; tt.style.color='#ec407a';
+  if(score>bestScore){ bestScore=score; localStorage.setItem('moko_best3',bestScore); be.textContent=bestScore; }
   showResult(allClear);
 }
 
-function showResult(allClear) {
-  const cleared=allClear?currentLevel+1:currentLevel;
-  const totalLevels=LEVELS.length;
+function showResult(allClear){
+  const cleared=allClear?lv+1:lv;
+  const total=LEVELS.length;
   let stars=score>=100?'🌟🌟🌟':score>=50?'🌟🌟':score>=20?'🌟':'💪';
-  let title=allClear?'🎊 全部通关！萌可大师！🏆'
-    :cleared>=4?'太厉害了！🎉'
-    :cleared>=2?'好棒！继续加油！😊'
-    :cleared>=1?'不错哦！💪'
-    :'再来一次吧！🌸';
+  let title=allClear?'🎊 全部通关！萌可大师！🏆':cleared>=4?'太厉害了！🎉':cleared>=2?'好棒！继续加油！😊':cleared>=1?'不错哦！💪':'再来一次吧！🌸';
 
   const overlay=document.createElement('div'); overlay.className='modal-overlay';
-  overlay.innerHTML=`<div class="modal">
-    <span class="big">${allClear?'👑':score>=50?'🦄':score>=20?'💗':'🌸'}</span>
-    <div class="r-title">${title}</div>
-    <div class="r-score">${score}</div>
-    <div class="r-stars">${stars} &nbsp; 通过 ${cleared}/${totalLevels} 关 &nbsp; 最高连击 ${bestCombo}次</div>
-    <div>
-      <button class="btn btn-start" onclick="this.closest('.modal-overlay').remove();startGame();">🔄 重新开始</button>
-    </div>
-  </div>`;
+  overlay.innerHTML='<div class="modal"><span class="big">'+(allClear?'👑':score>=50?'🦄':score>=20?'💗':'🌸')+'</span><div class="r-title">'+title+'</div><div class="r-score">'+score+'</div><div class="r-stars">'+stars+' &nbsp; 通过 '+cleared+'/'+total+' 关 &nbsp; 最高连击 '+bestCombo+'次</div><div><button class="btn btn-start" onclick="this.closest(\'.modal-overlay\').remove();startGame();">🔄 重新开始</button></div></div>';
   overlay.addEventListener('click',(e)=>{ if(e.target===overlay) overlay.remove(); });
   document.body.appendChild(overlay);
 }
 
-ga.addEventListener('pointerdown',(e)=>{ if(e.target===ga&&!gameRunning) startGame(); });
-buildLevel();
+ga.addEventListener('pointerdown',(e)=>{ if(e.target===ga&&!running) startGame(); });
+initLv();
 </script>
 </body>
 </html>
