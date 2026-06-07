@@ -287,14 +287,36 @@ function initRec(){
 
     r.onerror=(e)=>{
       const err=e.error;
-      if(err==='aborted'){/* 用户松手，正常 */}
-      else if(err==='no-speech'){vsText.textContent='没听到声音～';safeStop();setTimeout(()=>vs.classList.remove('show'),1000);}
-      else if(err==='not-allowed'){vsText.textContent='请打开设置允许麦克风';safeStop();setTimeout(()=>vs.classList.remove('show'),2500);}
-      else if(err==='network'){vsText.textContent='网络问题';safeStop();setTimeout(()=>vs.classList.remove('show'),1500);}
-      else{vsText.textContent='语音失败';safeStop();setTimeout(()=>vs.classList.remove('show'),1500);}
+      if(err==='no-speech'){
+        vsText.textContent='没听到声音～请说话';
+        safeStop();
+        setTimeout(()=>vs.classList.remove('show'),1500);
+      }else if(err==='not-allowed'){
+        vsText.textContent='请打开设置允许麦克风';
+        safeStop();
+        setTimeout(()=>vs.classList.remove('show'),2500);
+      }else if(err==='network'){
+        vsText.textContent='网络问题';
+        safeStop();
+        setTimeout(()=>vs.classList.remove('show'),1500);
+      }else if(err==='aborted'){
+        safeStop();
+        vs.classList.remove('show');
+      }else{
+        safeStop();
+        vs.classList.remove('show');
+      }
     };
 
-    r.onend=()=>{/* onend 不做任何事，等松手处理 */};
+    r.onend=()=>{
+      // onend 触发时如果有识别结果就发送
+      const txt = tx.value.trim();
+      if(txt && isActive){
+        safeStop();
+        vs.classList.remove('show');
+        setTimeout(()=>sendText(),100);
+      }
+    };
 
     try{
       isActive=true;vb.classList.add('rec');vb.textContent='🔴';
