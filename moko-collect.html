@@ -407,6 +407,22 @@ function showResult(allClear){
 }
 
 ga.addEventListener('pointerdown',(e)=>{if(e.target===ga&&!running)startGame();});
+
+// ===== 背景音乐 =====
+let bgMusic=null, musicOn=false;
+(function initMusic(){
+  bgMusic = new Audio('https://leehomlove.github.io/ai-daily/moko_theme.mp3');
+  bgMusic.loop = true;
+  bgMusic.volume = 0.25;
+})();
+
+function toggleMusic(){
+  if(!bgMusic) return;
+  if(musicOn){ bgMusic.pause(); musicOn=false; }
+  else { bgMusic.play().catch(()=>{}); musicOn=true; }
+  return musicOn;
+}
+
 buildLevel();
 </script>
 </body>
