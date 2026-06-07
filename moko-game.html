@@ -363,20 +363,78 @@ function toggleSpeech() {
   speakerBtn.textContent = speechActive ? '🔊' : '🔇';
 }
 
-// ===== 语音输入 =====
+// ===== 语音输入 - iOS Safari 优化版 =====
 let recognition=null, isRecording=false;
 function initSpeech() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) { voiceBtn.style.opacity='0.4'; voiceBtn.title='语音不支持（请打字）'; return; }
+
   recognition = new SR();
-  recognition.lang='zh-CN'; recognition.continuous=false; recognition.interimResults=false;
-  recognition.onresult=(e)=>{ const t=e.results[0][0].transcript.trim(); if(t){ textInput.value=t; sendText(); } stopRecording(); };
-  recognition.onerror=()=>stopRecording(); recognition.onend=()=>stopRecording();
+  recognition.lang='zh-CN';
+  recognition.continuous=false;
+  recognition.interimResults=true;  // iOS Safari 需要 interim 才能触发 onresult
+  recognition.maxAlternatives=1;
+
+  recognition.onresult=(e)=>{
+    // 优先取 final 结果，没有则取 interim 暂存
+    let finalText='', interimText='';
+    for(let i=0;i<e.results.length;i++){
+      const r=e.results[i];
+      if(r.isFinal){ finalText+=r[0].transcript; }
+      else{ interimText+=r[0].transcript; }
+    }
+    const t=(finalText||interimText).trim();
+    if(t && (finalText||interimText.length>3)){
+      textInput.value=t;
+      // iOS 上不加延时可能导致 sendText 为空
+      requestAnimationFrame(()=>{
+        requestAnimationFrame(()=>sendText());
+      });
+    }
+    stopRecording();
+  };
+  recognition.onerror=(e)=>{
+    console.log('Speech error:',e.error);
+    stopRecording();
+  };
+  recognition.onend=()=>stopRecording();
+
+  // iOS Safari 14+ 需要一次手动激活
+  console.log('✅ 语音识别已就绪 (iOS Safari)');
 }
-function startRecording() { if(!recognition)return; try{ isRecording=true; voiceBtn.classList.add('recording'); voiceBtn.textContent='🔴'; recognition.start(); }catch(e){} }
-function stopRecording() { isRecording=false; voiceBtn.classList.remove('recording'); voiceBtn.textContent='🎤'; }
+function startRecording() {
+  if(!recognition)return;
+  try{
+    // 确保之前的实例彻底结束
+    recognition.abort();
+    // iOS 需要短暂延迟
+    setTimeout(()=>{
+      try{
+        isRecording=true;
+        voiceBtn.classList.add('recording');
+        voiceBtn.textContent='🔴';
+        recognition.start();
+        console.log('🎤 开始录音…');
+      }catch(e){ console.log('start error:',e); stopRecording(); }
+    },100);
+  }catch(e){ console.log('abort error:',e); }
+}
+function stopRecording() {
+  if(!isRecording)return;
+  isRecording=false;
+  voiceBtn.classList.remove('recording');
+  voiceBtn.textContent='🎤';
+  try{ recognition.stop(); }catch(e){}
+  console.log('🎤 停止录音');
+}
+
+// iOS touch 事件更可靠，用 touch 替代 pointer
+voiceBtn.addEventListener('touchstart',(e)=>{e.preventDefault();startRecording();});
+voiceBtn.addEventListener('touchend',(e)=>{e.preventDefault();stopRecording();});
+voiceBtn.addEventListener('touchcancel',stopRecording);
+// 保留 pointer 作为桌面端兼容
 voiceBtn.addEventListener('pointerdown',(e)=>{e.preventDefault();startRecording();});
-voiceBtn.addEventListener('pointerup',stopRecording);
+voiceBtn.addEventListener('pointerup',(e)=>{e.preventDefault();stopRecording();});
 voiceBtn.addEventListener('pointerleave',stopRecording);
 
 // ===== 初始化 =====
