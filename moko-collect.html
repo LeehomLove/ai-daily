@@ -132,6 +132,7 @@
 <body>
 <div class="bg-stars"></div>
 
+<button class="switch-tab" onclick="toggleMusic()" title="音乐" style="bottom:160px;">🎵</button>
 <button class="switch-tab" onclick="location.href='moko-game.html'" title="切换到冒险模式">🏠</button>
 
 <script>
@@ -418,9 +419,8 @@ let bgMusic=null, musicOn=false;
 
 function toggleMusic(){
   if(!bgMusic) return;
-  if(musicOn){ bgMusic.pause(); musicOn=false; }
-  else { bgMusic.play().catch(()=>{}); musicOn=true; }
-  return musicOn;
+  if(musicOn){ bgMusic.pause(); musicOn=false; document.querySelector('.switch-tab[onclick*="toggleMusic"]').textContent='🎵'; }
+  else { bgMusic.play().catch(()=>{}); musicOn=true; document.querySelector('.switch-tab[onclick*="toggleMusic"]').textContent='🎶'; }
 }
 
 buildLevel();
