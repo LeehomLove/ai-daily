@@ -31,9 +31,13 @@
   .topbar img{width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.2);}
   .topbar .n{font-size:14px;font-weight:700;}
   .topbar .w{font-size:10px;color:rgba(255,255,255,.4);}
-  .topbar .r{display:flex;align-items:center;gap:8px;}
-  .spk-btn{width:32px;height:32px;border-radius:50%;border:none;background:rgba(255,255,255,.1);color:#fff;font-size:14px;cursor:pointer;font-family:inherit;flex-shrink:0;}
-  .spk-btn:active{background:rgba(255,255,255,.2);}
+  .topbar .r{display:flex;align-items:center;gap:6px;}
+  .icon-btn{
+    width:30px;height:30px;border-radius:50%;border:none;background:rgba(255,255,255,.08);
+    color:#fff;font-size:14px;cursor:pointer;font-family:inherit;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .icon-btn:active{background:rgba(255,255,255,.2);}
   .star-b{font-size:13px;font-weight:700;background:rgba(255,255,255,.1);padding:3px 10px;border-radius:12px;}
 
   .chat{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:12px;-webkit-overflow-scrolling:touch;}
@@ -108,16 +112,23 @@
   .speak-ind .wave span:nth-child(5){height:9px;background:#ce93d8;animation-delay:.4s;}
   @keyframes wa{to{transform:scaleY(.3);}}
 
-  /* 语音状态弹窗 */
   .voice-status{
     position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:200;
     background:rgba(0,0,0,.85);color:#fff;border-radius:24px;padding:24px 32px;
-    text-align:center;font-size:16px;display:none;flex-direction:column;align-items:center;gap:12px;
-    min-width:200px;
+    text-align:center;font-size:16px;display:none;flex-direction:column;align-items:center;gap:12px;min-width:200px;
   }
   .voice-status.show{display:flex;}
   .voice-status .mic-icon{font-size:48px;}
   .voice-status .mic-text{font-size:14px;color:rgba(255,255,255,.6);}
+
+  .switch-tab{
+    position:fixed;bottom:100px;right:14px;z-index:50;
+    width:46px;height:46px;border-radius:50%;border:2px solid rgba(255,255,255,.2);
+    background:rgba(206,147,216,.7);color:#fff;font-size:18px;cursor:pointer;
+    backdrop-filter:blur(10px);box-shadow:0 4px 20px rgba(156,39,176,.3);
+    font-family:inherit;display:flex;align-items:center;justify-content:center;
+  }
+  .switch-tab:active{transform:scale(.9);}
 </style>
 </head>
 <body>
@@ -135,10 +146,16 @@
   <div class="mic-text" id="voiceResult"></div>
 </div>
 
+<button class="switch-tab" onclick="location.href='moko-collect.html'" title="收集模式">🎯</button>
+
 <div class="main">
   <div class="topbar">
     <div class="mi"><img id="mokoAv" src="https://leehomlove.github.io/ai-daily/moko1.jpg" alt=""><div><div class="w" id="worldNm">🌈 彩虹森林</div><div class="n" id="mokoNm">和萌可一起冒险</div></div></div>
-    <div class="r"><button class="spk-btn" id="speakerBtn" onclick="toggleSpeech()" title="萌可声音">🔊</button><div class="star-b">⭐ <span id="starN">0</span></div></div>
+    <div class="r">
+      <button class="icon-btn" id="musicBtn" onclick="toggleMusic()" title="音乐">🎵</button>
+      <button class="icon-btn" id="speakerBtn" onclick="toggleSpeech()" title="萌可声音">🔊</button>
+      <div class="star-b">⭐ <span id="starN">0</span></div>
+    </div>
   </div>
 
   <div class="chat" id="chat">
@@ -164,6 +181,7 @@
 
 <script>
 const DK='sk-f369a602e9be4452b179433a12fc96e4', BASE='https://leehomlove.github.io/ai-daily/';
+const THEME_URL = BASE+'moko_theme.mp3';
 
 const MOKOS=[{id:'heart',name:'爱心萌可',img:BASE+'moko1.jpg',e:'💗',
   p:'你是爱心萌可💗。用纯中文回复，你只说中文。你温柔可爱，喜欢说"啾~"。你的魔法来自爱。用💗结尾。'},
@@ -195,12 +213,25 @@ const WORLDS=[{id:'forest',nm:'🌈 彩虹森林',ic:'🌈',
    p:'云朵乐园 - 终极冒险！棉花糖云朵滑梯，彩虹饼干房子。萌可公主颁发勇气勋章。让小朋友觉得自己是最棒的小英雄！'}];
 
 let cm=null,cw=0,sc=0,ms=[],loading=false,started=false,spActive=true,spQ=[],spk=false;
-let chs=[];
+let chs=[], bgMusic=null, musicOn=false;
 const ca=document.getElementById('chat'),cd=document.getElementById('choices');
 const vb=document.getElementById('voiceBtn'),tx=document.getElementById('textInp');
-const pk=document.getElementById('mokoPick'),sb=document.getElementById('speakerBtn');
+const pk=document.getElementById('mokoPick'),mb=document.getElementById('musicBtn');
 const spI=document.getElementById('speakInd'),vs=document.getElementById('voiceStatus');
 const vsText=document.getElementById('voiceStatusText'),vsRes=document.getElementById('voiceResult');
+
+// ===== 背景音乐 =====
+function initMusic(){
+  if(bgMusic) return;
+  bgMusic = new Audio(THEME_URL);
+  bgMusic.loop = true;
+  bgMusic.volume = 0.25;
+}
+function toggleMusic(){
+  initMusic();
+  if(musicOn){ bgMusic.pause(); musicOn=false; mb.textContent='🎵'; }
+  else { bgMusic.play().catch(()=>{}); musicOn=true; mb.textContent='🎶'; }
+}
 
 // ===== 语音朗读 =====
 function speak(t){
@@ -222,140 +253,45 @@ function procQ(){
     let i=0;function ns(){if(i>=sents.length){procQ();return;}const s=sents[i].trim();i++;if(s.length<2){ns();return;}const su=new SpeechSynthesisUtterance(s);su.lang=u.lang;su.rate=u.rate;su.pitch=u.pitch;su.volume=u.volume;if(v)su.voice=v;su.onend=()=>setTimeout(ns,60);su.onerror=ns;speechSynthesis.speak(su);}ns();
   }else{u.onend=u.onerror=procQ;speechSynthesis.speak(u);}
 }
-function toggleSpeech(){spActive=!spActive;if(!spActive){speechSynthesis.cancel();spQ=[];spk=false;spI.classList.remove('on');}sb.textContent=spActive?'🔊':'🔇';}
+function toggleSpeech(){spActive=!spActive;if(!spActive){speechSynthesis.cancel();spQ=[];spk=false;spI.classList.remove('on');}document.getElementById('speakerBtn').textContent=spActive?'🔊':'🔇';}
 
-// ===== 语音输入（iOS Safari 兼容版）=====
+// ===== 语音输入 =====
 let rec=null,recording=false;
 function initRec(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){vb.style.opacity='0.3';vb.title='语音不可用（请升级 iOS）';return;}
-
+  if(!SR){vb.style.opacity='0.3';vb.title='语音不可用';return;}
   rec=new SR();
-  rec.lang='zh-CN';
-  rec.continuous=false;
-  rec.interimResults=true;
-
+  rec.lang='zh-CN';rec.continuous=false;rec.interimResults=true;
   rec.onresult=(ev)=>{
     let ft='',it='';
     for(let i=0;i<ev.results.length;i++){const r=ev.results[i];if(r.isFinal)ft+=r[0].transcript;else it+=r[0].transcript;}
-    const result=(ft||it).trim();
-
-    // 实时更新状态弹窗
-    if(result){
-      vsRes.textContent=result;
-      vsText.textContent=ft?'听到了！':'正在识别…';
-    }
-
-    if(result&&result.length>1){
-      tx.value=result;
-      // 关闭录音 UI
-      stopRec();
-      // 发送
-      setTimeout(()=>{
-        vs.classList.remove('show');
-        sendText();
-      },500);
-    }
+    const t=(ft||it).trim();
+    if(t){ vsRes.textContent=t; vsText.textContent=ft?'听到了！':'正在识别…'; }
+    if(t&&t.length>1){ tx.value=t; stopRec(); setTimeout(()=>{vs.classList.remove('show');sendText();},500); }
   };
-
-  rec.onerror=(e)=>{
-    console.warn('语音:',e.error);
-    vsText.textContent=e.error==='no-speech'?'没听到声音，请再说一次':'语音失败了，请重试';
-    setTimeout(()=>{vs.classList.remove('show');stopRec();},1200);
-  };
-
-  rec.onend=()=>{
-    recording=false;vb.classList.remove('rec');vb.textContent='🎤';
-  };
-
-  rec.onspeechstart=()=>{
-    vsText.textContent='正在听…';
-    vsRes.textContent='';
-  };
-
-  console.log('✅ 语音就绪 (iOS Safari)');
+  rec.onerror=(e)=>{ vsText.textContent=e.error==='no-speech'?'没听到声音，请再说一次':'语音失败，请重试'; setTimeout(()=>{vs.classList.remove('show');stopRec();},1200); };
+  rec.onend=()=>{recording=false;vb.classList.remove('rec');vb.textContent='🎤';};
+  rec.onspeechstart=()=>{vsText.textContent='正在听…';vsRes.textContent='';};
 }
-
 function startRec(){
-  if(!rec)return;
-  // 显示状态弹窗
-  vs.classList.add('show');
-  vsText.textContent='正在听…';
-  vsRes.textContent='';
-
-  // 先终止旧实例
+  if(!rec)return;vs.classList.add('show');vsText.textContent='正在听…';vsRes.textContent='';
   try{rec.abort();}catch(e){}
-
-  setTimeout(()=>{
-    try{
-      recording=true;
-      vb.classList.add('rec');
-      vb.textContent='🔴';
-      rec.start();
-    }catch(e){
-      console.log('start error:',e);
-      vsText.textContent='请允许使用麦克风';
-      vsRes.textContent='打开设置 > Safari > 麦克风';
-      setTimeout(()=>vs.classList.remove('show'),2000);
-      stopRec();
-    }
-  },100);
+  setTimeout(()=>{try{recording=true;vb.classList.add('rec');vb.textContent='🔴';rec.start();}catch(e){vsText.textContent='请允许使用麦克风';setTimeout(()=>vs.classList.remove('show'),2000);stopRec();}},100);
 }
+function stopRec(){ try{rec.stop();}catch(e){} recording=false;vb.classList.remove('rec');vb.textContent='🎤'; }
 
-function stopRec(){
-  try{rec.stop();}catch(e){}
-  recording=false;
-  vb.classList.remove('rec');
-  vb.textContent='🎤';
-}
-
-// === 点击事件 ===
-// 单击 = 开始录音，再单击 = 停止
-vb.addEventListener('click',(e)=>{
-  e.preventDefault();
-  if(recording){
-    // 正在录 → 停止
-    stopRec();
-    vs.classList.remove('show');
-    // 如果 input 里有文字就发送
-    if(tx.value.trim()){
-      setTimeout(()=>sendText(),100);
-    }
-  } else {
-    // 没在录 → 开始
-    startRec();
-  }
-});
-
-// 长按也支持
-vb.addEventListener('pointerdown',(e)=>{e.preventDefault(); if(!recording)startRec();});
-vb.addEventListener('pointerup',(e)=>{e.preventDefault(); if(recording){stopRec();vs.classList.remove('show');if(tx.value.trim())setTimeout(()=>sendText(),100);}});
+vb.addEventListener('click',(e)=>{e.preventDefault();if(recording){stopRec();vs.classList.remove('show');if(tx.value.trim())setTimeout(()=>sendText(),100);}else{startRec();}});
+vb.addEventListener('pointerdown',(e)=>{e.preventDefault();if(!recording)startRec();});
+vb.addEventListener('pointerup',(e)=>{e.preventDefault();if(recording){stopRec();vs.classList.remove('show');if(tx.value.trim())setTimeout(()=>sendText(),100);}});
 vb.addEventListener('pointerleave',()=>{if(recording)stopRec();});
 
-// ===== 萌可选择（语音可用性也在这里显示）=====
+// ===== 萌可选择 =====
 (function initGrid(){
-  // 先检测语音是否可用
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   const hasSpeech = !!SR;
-
-  document.getElementById('mokoGrid').innerHTML=MOKOS.map(m=>`
-    <div class="moko-card" onclick="pick('${m.id}')"><img src="${m.img}" alt="${m.name}"><div class="nc">${m.e} ${m.name}</div></div>`).join('');
-
-  // 添加语音状态提示
-  if (!hasSpeech) {
-    const tip = document.createElement('div');
-    tip.style.cssText = 'margin-top:16px;font-size:12px;color:rgba(255,255,255,.4);text-align:center;';
-    tip.textContent = '⚠️ 语音功能需 Safari 14+ 或 Chrome';
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      // 预请求权限
-      navigator.mediaDevices.getUserMedia({audio:true}).then(()=>{
-        tip.textContent = '✅ 麦克风可用，选择萌可后点击🎤说话';
-        tip.style.color = 'rgba(255,255,255,.6)';
-      }).catch(()=>{
-        tip.textContent = '⚠️ 需要在手机设置中允许麦克风';
-      });
-    }
-    document.querySelector('.moko-pick').appendChild(tip);
+  document.getElementById('mokoGrid').innerHTML=MOKOS.map(m=>`<div class="moko-card" onclick="pick('${m.id}')"><img src="${m.img}" alt="${m.name}"><div class="nc">${m.e} ${m.name}</div></div>`).join('');
+  if(!hasSpeech){
+    const tip=document.createElement('div');tip.style.cssText='margin-top:16px;font-size:12px;color:rgba(255,255,255,.4);text-align:center;';tip.textContent='⚠️ 语音功能需要 Safari 14+';document.querySelector('.moko-pick').appendChild(tip);
   }
 })();
 function pick(id){
@@ -427,6 +363,7 @@ function reset(){started=false;cw=0;cm=null;ms=[];chs=[];ca.innerHTML='';cd.inne
 speechSynthesis.getVoices();
 speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();
 initRec();
+initMusic();
 </script>
 </body>
 </html>
