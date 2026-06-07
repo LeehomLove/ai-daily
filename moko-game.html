@@ -12,31 +12,33 @@
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
     font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-    background: linear-gradient(180deg, #0a0a2e 0%, #1a1040 30%, #2d1b69 60%, #1a1040 100%);
-    min-height: 100vh; color: #fff;
-    touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+    background: linear-gradient(180deg, #0a0a2e, #1a1040, #2d1b69, #1a1040);
+    min-height: 100vh; color: #fff; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
   }
   body::before {
     content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
-    background-image:
+    background: radial-gradient(ellipse at 50% 20%, rgba(120,100,255,.15), transparent 60%),
       radial-gradient(2px 2px at 10% 20%, #fff, transparent), radial-gradient(2px 2px at 25% 45%, #fff, transparent),
-      radial-gradient(1px 1px at 40% 15%, rgba(255,255,255,.7), transparent), radial-gradient(2px 2px at 55% 35%, #fff, transparent),
-      radial-gradient(2px 2px at 85% 50%, #fff, transparent), radial-gradient(3px 3px at 20% 75%, rgba(255,215,0,.6), transparent),
-      radial-gradient(2px 2px at 50% 80%, #fff, transparent), radial-gradient(2px 2px at 75% 70%, rgba(255,255,255,.7), transparent);
+      radial-gradient(2px 2px at 55% 35%, #fff, transparent), radial-gradient(3px 3px at 20% 75%, rgba(255,215,0,.6), transparent),
+      radial-gradient(2px 2px at 75% 70%, rgba(255,255,255,.7), transparent);
   }
-  .main { position:relative; z-index:1; display:flex; flex-direction:column; height:100vh; max-width:480px; margin:0 auto; }
+  .main { position:relative; z-index:1; display:flex; flex-direction:column; height:100vh; max-width:520px; margin:0 auto; }
   .topbar {
     display:flex; align-items:center; justify-content:space-between; padding:8px 14px;
-    background:rgba(0,0,0,.3); backdrop-filter:blur(10px); border-bottom:1px solid rgba(255,255,255,.08);
+    background:rgba(0,0,0,.4); backdrop-filter:blur(15px); -webkit-backdrop-filter:blur(15px);
+    border-bottom:1px solid rgba(255,255,255,.06); flex-shrink:0;
   }
-  .topbar .title { font-size:16px; font-weight:800; }
-  .topbar .stars { font-size:14px; }
-  .topbar .world { font-size:11px; color:rgba(255,255,255,.5); }
-  .topbar .speaker-btn {
-    width:32px; height:32px; border-radius:50%; border:none; background:rgba(255,255,255,.1);
-    color:#fff; font-size:14px; cursor:pointer; flex-shrink:0;
+  .topbar .moko-info { display:flex; align-items:center; gap:8px; }
+  .topbar img { width:32px; height:32px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,255,255,.2); }
+  .topbar .name { font-size:14px; font-weight:700; }
+  .topbar .world { font-size:10px; color:rgba(255,255,255,.4); }
+  .topbar .right { display:flex; align-items:center; gap:8px; }
+  .speaker-btn {
+    width:32px;height:32px;border-radius:50%;border:none;background:rgba(255,255,255,.1);
+    color:#fff;font-size:14px;cursor:pointer;font-family:inherit;flex-shrink:0;
   }
-  .topbar .speaker-btn:active { background:rgba(255,255,255,.2); }
+  .speaker-btn:active { background:rgba(255,255,255,.2); }
+  .star-badge { font-size:13px;font-weight:700; background:rgba(255,255,255,.1); padding:3px 10px; border-radius:12px; }
 
   .chat {
     flex:1; overflow-y:auto; padding:12px 14px; display:flex; flex-direction:column; gap:12px;
@@ -44,142 +46,146 @@
   }
   .chat::-webkit-scrollbar { display:none; }
 
-  .msg { display:flex; gap:10px; max-width:88%; animation:fadeUp .3s ease; }
-  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .msg { display:flex; gap:8px; max-width:88%; animation:fadeUp .25s ease; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
   .msg.moko { align-self:flex-start; }
-  .msg.user { align-self:flex-end; flex-direction:row-reverse; }
+  .msg.you { align-self:flex-end; flex-direction:row-reverse; }
   .msg .avatar {
-    width:42px; height:42px; border-radius:50%; flex-shrink:0; object-fit:cover;
-    border:2px solid rgba(255,255,255,.3); background:rgba(255,255,255,.1);
+    width:36px;height:36px;border-radius:50%;flex-shrink:0;object-fit:cover;
+    border:2px solid rgba(255,255,255,.2);
   }
   .msg .bubble {
-    background:rgba(255,255,255,.1); backdrop-filter:blur(5px); border-radius:18px;
-    padding:10px 14px; font-size:15px; line-height:1.5; border:1px solid rgba(255,255,255,.06);
+    background:rgba(255,255,255,.08); border-radius:18px; padding:10px 14px; font-size:15px;
+    line-height:1.55; border:1px solid rgba(255,255,255,.05); word-break:break-word;
   }
-  .msg.user .bubble { background:rgba(120,100,255,.3); border:1px solid rgba(120,100,255,.15); }
+  .msg.you .bubble { background:rgba(120,100,255,.25); }
   .msg.moko .bubble { border-radius:18px 18px 18px 4px; }
-  .msg.user .bubble { border-radius:18px 18px 4px 18px; }
+  .msg.you .bubble { border-radius:18px 18px 4px 18px; }
+
+  .typing-cursor { display:inline-block; width:2px; height:16px; background:#fff; margin-left:2px; animation:blink .6s infinite; vertical-align:middle; }
+  @keyframes blink { 0%,100%{opacity:.5} 50%{opacity:1} }
 
   .choices { display:flex; flex-wrap:wrap; gap:8px; padding:4px 14px 8px; }
   .choice-btn {
-    background:rgba(255,255,255,.15); backdrop-filter:blur(5px); border:1px solid rgba(255,255,255,.15);
+    background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.1);
     border-radius:20px; padding:10px 18px; color:#fff; font-size:14px; font-weight:600;
-    cursor:pointer; font-family:inherit; transition:all .2s; flex:1; min-width:100px; text-align:center;
+    cursor:pointer; font-family:inherit; transition:all .15s; flex:1; min-width:90px; text-align:center;
+    -webkit-tap-highlight-color:transparent;
   }
-  .choice-btn:active { background:rgba(120,100,255,.4); transform:scale(.96); }
+  .choice-btn:active { background:rgba(120,100,255,.35); transform:scale(.96); }
 
   .input-area {
-    padding:6px 14px var(--safe-bottom) 14px; background:rgba(0,0,0,.4);
-    backdrop-filter:blur(10px); border-top:1px solid rgba(255,255,255,.08);
+    padding:6px 14px var(--safe-bottom) 14px; background:rgba(0,0,0,.5);
+    backdrop-filter:blur(15px); -webkit-backdrop-filter:blur(15px);
+    border-top:1px solid rgba(255,255,255,.06); flex-shrink:0;
   }
   .input-row { display:flex; gap:8px; align-items:center; }
   .voice-btn {
-    width:48px; height:48px; border-radius:50%; border:none;
+    width:50px;height:50px;border-radius:50%;border:none;
     background:linear-gradient(135deg, #ff4081, #7c4dff); color:#fff; font-size:22px;
-    cursor:pointer; flex-shrink:0; box-shadow:0 4px 20px rgba(255,64,129,.3);
+    cursor:pointer; flex-shrink:0; box-shadow:0 4px 20px rgba(255,64,129,.25);
     transition:all .15s; display:flex; align-items:center; justify-content:center; font-family:inherit;
+    -webkit-tap-highlight-color:transparent;
   }
-  .voice-btn:active { transform:scale(.9); }
-  .voice-btn.recording { background:linear-gradient(135deg, #ff1744, #d50000); animation:pulse .8s infinite; box-shadow:0 0 30px rgba(255,23,68,.6); }
-  @keyframes pulse { 0%,100%{box-shadow:0 0 20px rgba(255,23,68,.4)} 50%{box-shadow:0 0 40px rgba(255,23,68,.8)} }
+  .voice-btn:active { transform:scale(.88); }
+  .voice-btn.rec { background:linear-gradient(135deg, #ff1744, #d50000); animation:ringPulse .7s infinite; }
+  @keyframes ringPulse { 0%,100%{box-shadow:0 0 20px rgba(255,23,68,.3)} 50%{box-shadow:0 0 40px rgba(255,23,68,.7)} }
   .text-input {
-    flex:1; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.1);
-    border-radius:24px; padding:12px 16px; color:#fff; font-size:16px; font-family:inherit; outline:none; min-width:0;
+    flex:1; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.06);
+    border-radius:25px; padding:13px 18px; color:#fff; font-size:16px; font-family:inherit; outline:none;
+    min-width:0; -webkit-appearance:none;
   }
-  .text-input::placeholder { color:rgba(255,255,255,.35); }
+  .text-input::placeholder { color:rgba(255,255,255,.3); }
   .send-btn {
-    width:48px; height:48px; border-radius:50%; border:none; background:rgba(255,255,255,.15);
-    color:#fff; font-size:20px; cursor:pointer; flex-shrink:0;
+    width:50px;height:50px;border-radius:50%;border:none;background:rgba(255,255,255,.1);
+    color:#fff;font-size:20px;cursor:pointer;flex-shrink:0;font-family:inherit;
   }
-  .send-btn:active { background:rgba(255,255,255,.25); }
+  .send-btn:active { background:rgba(255,255,255,.2); }
 
-  .select-screen {
-    position:fixed; inset:0; z-index:50; background:rgba(0,0,0,.85);
-    display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px;
+  .moko-pick {
+    position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.9);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 16px;
   }
-  .select-screen h2 { font-size:24px; margin-bottom:6px; text-align:center; }
-  .select-screen .sub { font-size:14px; color:rgba(255,255,255,.5); margin-bottom:20px; text-align:center; }
-  .moko-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; max-width:360px; width:100%; }
+  .moko-pick h2 { font-size:22px; margin-bottom:4px; }
+  .moko-pick .sub { font-size:13px; color:rgba(255,255,255,.4); margin-bottom:20px; }
+  .moko-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; max-width:360px; width:100%; }
   .moko-card {
-    background:rgba(255,255,255,.08); border-radius:20px; padding:14px 8px;
-    text-align:center; cursor:pointer; border:2px solid transparent; transition:all .2s;
+    background:rgba(255,255,255,.06); border-radius:18px; padding:14px 6px; text-align:center;
+    cursor:pointer; border:2px solid transparent; transition:all .15s;
+    -webkit-tap-highlight-color:transparent;
   }
-  .moko-card:active { background:rgba(120,100,255,.2); border-color:rgba(120,100,255,.4); transform:scale(.95); }
-  .moko-card img { width:60px; height:60px; border-radius:50%; object-fit:cover; margin-bottom:6px; border:2px solid rgba(255,255,255,.3); }
-  .moko-card .name { font-size:13px; font-weight:700; }
+  .moko-card:active { background:rgba(120,100,255,.15); border-color:rgba(120,100,255,.3); transform:scale(.95); }
+  .moko-card img { width:56px;height:56px;border-radius:50%;object-fit:cover;margin-bottom:6px;border:2px solid rgba(255,255,255,.2); }
+  .moko-card .n { font-size:12px;font-weight:700; }
 
-  .intro-overlay {
-    position:fixed; inset:0; z-index:60; background:radial-gradient(ellipse at center, #1a1040 0%, #0a0a2e 100%);
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    animation:fadeOut .5s ease 2s forwards;
+  .intro {
+    position:fixed;inset:0;z-index:60;background:radial-gradient(ellipse at center, #1a1040, #0a0a2e);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    animation:fadeAway .5s ease 2s forwards;
   }
-  @keyframes fadeOut { to { opacity:0; pointer-events:none; } }
-  .intro-overlay .title { font-size:32px; font-weight:900; text-align:center; animation:titleIn .8s ease; }
-  @keyframes titleIn { from{transform:scale(.5);opacity:0} to{transform:scale(1);opacity:1} }
-  .intro-overlay .subtitle { font-size:16px; color:rgba(255,255,255,.6); margin-top:8px; animation:subIn .8s ease; }
-  @keyframes subIn { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+  @keyframes fadeAway { to { opacity:0; pointer-events:none; } }
+  .intro .t { font-size:30px;font-weight:900;text-align:center;animation:pop .7s ease; }
+  @keyframes pop { from{transform:scale(.5);opacity:0} to{transform:scale(1);opacity:1} }
+  .intro .s { font-size:15px;color:rgba(255,255,255,.5);margin-top:6px; }
 
-  .world-transition {
-    position:fixed; inset:0; z-index:40; background:#0a0a2e;
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    animation:worldAnim 2s ease forwards;
+  .world-trans {
+    position:fixed;inset:0;z-index:40;background:#0a0a2e;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    animation:wt 2s ease forwards;
   }
-  @keyframes worldAnim { 0%{opacity:0} 20%{opacity:1} 80%{opacity:1} 100%{opacity:0;pointer-events:none} }
-  .world-transition .icon { font-size:60px; animation:bounce .5s ease infinite; }
-  .world-transition .name { font-size:24px; font-weight:900; margin-top:10px; }
+  @keyframes wt { 0%{opacity:0} 20%{opacity:1} 80%{opacity:1} 100%{opacity:0;pointer-events:none} }
+  .world-trans .ic { font-size:56px;animation:bounce .5s ease infinite; }
+  .world-trans .nm { font-size:22px;font-weight:900;margin-top:8px; }
 
   .loading-dots { display:inline-flex; gap:4px; }
-  .loading-dots span { width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5);animation:dotBounce 1.4s infinite; }
+  .loading-dots span { width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.4);animation:dotBounce 1.3s infinite; }
   .loading-dots span:nth-child(2) { animation-delay:.2s; }
   .loading-dots span:nth-child(3) { animation-delay:.4s; }
-  @keyframes dotBounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-8px)} }
+  @keyframes dotBounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-7px)} }
 
-  .speaking-indicator {
-    position:fixed; bottom:100px; left:50%; transform:translateX(-50%); z-index:30;
-    background:rgba(0,0,0,.7); color:#fff; border-radius:20px; padding:8px 16px;
-    font-size:13px; display:none; align-items:center; gap:6px;
+  .speak-ind {
+    position:fixed;bottom:130px;left:50%;transform:translateX(-50%);z-index:30;
+    background:rgba(0,0,0,.7);color:#fff;border-radius:20px;padding:7px 14px;font-size:12px;
+    display:none;align-items:center;gap:6px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
   }
-  .speaking-indicator.show { display:flex; }
-  .speaking-indicator .wave { display:flex; gap:2px; align-items:flex-end; }
-  .speaking-indicator .wave span {
-    width:3px; background:var(--c,#ff4081); border-radius:2px;
-    animation:waveAnim .5s ease infinite alternate;
-  }
-  .speaking-indicator .wave span:nth-child(1) { height:8px; --c:#ff4081; animation-delay:0s; }
-  .speaking-indicator .wave span:nth-child(2) { height:14px; --c:#ce93d8; animation-delay:.1s; }
-  .speaking-indicator .wave span:nth-child(3) { height:10px; --c:#7c4dff; animation-delay:.2s; }
-  .speaking-indicator .wave span:nth-child(4) { height:16px; --c:#f48fb1; animation-delay:.3s; }
-  .speaking-indicator .wave span:nth-child(5) { height:9px; --c:#ce93d8; animation-delay:.4s; }
-  @keyframes waveAnim { to { transform:scaleY(.4); } }
+  .speak-ind.on { display:flex; }
+  .speak-ind .wave { display:flex; gap:2px; align-items:flex-end; }
+  .speak-ind .wave span { width:3px; border-radius:2px; animation:wa .4s ease infinite alternate; }
+  .speak-ind .wave span:nth-child(1){ height:8px; background:#ff4081; }
+  .speak-ind .wave span:nth-child(2){ height:14px; background:#ce93d8; animation-delay:.1s; }
+  .speak-ind .wave span:nth-child(3){ height:10px; background:#7c4dff; animation-delay:.2s; }
+  .speak-ind .wave span:nth-child(4){ height:16px; background:#f48fb1; animation-delay:.3s; }
+  .speak-ind .wave span:nth-child(5){ height:9px; background:#ce93d8; animation-delay:.4s; }
+  @keyframes wa { to { transform:scaleY(.3); } }
 </style>
 </head>
 <body>
 
-<div class="intro-overlay">
-  <div class="title">✨ 萌可<br>魔法冒险 ✨</div>
-  <div class="subtitle">和萌可一起探索魔法世界</div>
-</div>
+<div class="intro"><div class="t">✨ 萌可<br>魔法冒险 ✨</div><div class="s">和萌可一起探索魔法世界</div></div>
 
-<div class="speaking-indicator" id="speakingInd">
+<div class="speak-ind" id="speakInd">
   <div class="wave"><span></span><span></span><span></span><span></span><span></span></div>
   💬 萌可说话中...
 </div>
 
 <div class="main">
   <div class="topbar">
-    <div>
-      <div class="world" id="worldName">🌈 彩虹森林</div>
-      <div class="title" id="mokoName">和萌可一起冒险</div>
+    <div class="moko-info">
+      <img id="mokoAv" src="https://leehomlove.github.io/ai-daily/moko1.jpg" alt="">
+      <div>
+        <div class="world" id="worldNm">🌈 彩虹森林</div>
+        <div class="name" id="mokoNm">和萌可一起冒险</div>
+      </div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;">
+    <div class="right">
       <button class="speaker-btn" id="speakerBtn" onclick="toggleSpeech()" title="萌可声音">🔊</button>
-      <div class="stars">⭐ <span id="starCount">0</span></div>
+      <div class="star-badge">⭐ <span id="starN">0</span></div>
     </div>
   </div>
 
   <div class="chat" id="chat">
     <div class="msg moko">
-      <img class="avatar" id="mokoAvatar" src="https://leehomlove.github.io/ai-daily/moko1.jpg" alt="萌可">
+      <img class="avatar" src="https://leehomlove.github.io/ai-daily/moko1.jpg" alt="">
       <div class="bubble">选一个萌可伙伴<br>开始魔法冒险吧！✨</div>
     </div>
   </div>
@@ -189,389 +195,222 @@
   <div class="input-area">
     <div class="input-row">
       <button class="voice-btn" id="voiceBtn" title="按住说话">🎤</button>
-      <input class="text-input" id="textInput" type="text" placeholder="输入想说的话…" maxlength="200">
+      <input class="text-input" id="textInp" type="text" placeholder="输入想说的话…" maxlength="200" autocomplete="off">
       <button class="send-btn" id="sendBtn" onclick="sendText()">📤</button>
     </div>
   </div>
 </div>
 
-<div class="select-screen" id="selectScreen">
+<div class="moko-pick" id="mokoPick">
   <h2>🦄 选择萌可伙伴</h2>
   <div class="sub">选一个萌可陪你冒险吧！</div>
   <div class="moko-grid" id="mokoGrid"></div>
 </div>
 
 <script>
-const DEEPSEEK_KEY = 'sk-f369a602e9be4452b179433a12fc96e4';
-const DEEPSEEK_URL = 'https://api.deepseek.com/chat/completions';
-const BASE = 'https://leehomlove.github.io/ai-daily/';
+const DEEPSEEK_KEY='sk-f369a602e9be4452b179433a12fc96e4', BASE='https://leehomlove.github.io/ai-daily/';
 
-const MOKOS = [
-  { id:'heart',name:'爱心萌可',img:BASE+'moko1.jpg',emoji:'💗',color:'#ff4081',
-    persona:'你是爱心萌可💗，爱与温暖的化身。你温柔可爱，喜欢说"啾~"。你的一切魔力来自爱。用💗结尾，像温柔的小姐姐。' },
-  { id:'courage',name:'勇气萌可',img:BASE+'moko2.jpg',emoji:'🧡',color:'#ef6c00',
-    persona:'你是勇气萌可🧡，充满力量！你爽朗勇敢，什么都不怕。喜欢说"哈哈！"。你总是鼓励朋友。用⚡结尾。' },
-  { id:'happy',name:'幸福萌可',img:BASE+'moko3.jpg',emoji:'💛',color:'#f9a825',
-    persona:'你是幸福萌可💛，快乐的化身！你总是笑口常开，把快乐传染给大家。用☀️结尾，说话元气满满。' },
-  { id:'sing',name:'唱唱萌可',img:BASE+'moko5.jpg',emoji:'🎵',color:'#c2185b',
-    persona:'你是唱唱萌可🎵，爱唱歌的萌可！说话像在唱歌，能用歌声让花儿开放。用🎶结尾，语气像在哼旋律。' },
-  { id:'hope',name:'盼盼萌可',img:BASE+'moko6.jpg',emoji:'💚',color:'#2e7d32',
-    persona:'你是盼盼萌可💚，希望的化身。你温柔安静，看到一切美好。总给朋友希望。用🍀结尾。' },
-  { id:'wise',name:'正正萌可',img:BASE+'moko4.jpg',emoji:'💙',color:'#1565c0',
-    persona:'你是正正萌可💙，聪明的萌可！你善于思考，给朋友好建议。你的魔法来自知识。用📖结尾。' },
-];
+const MOKOS=[{id:'heart',name:'爱心萌可',img:BASE+'moko1.jpg',e:'💗',
+  p:'你是爱心萌可💗，爱和温暖的化身。你说话温柔可爱，总说"啾~"开头。用💗结尾。你的一切魔法来自爱。'},
+  {id:'courage',name:'勇气萌可',img:BASE+'moko2.jpg',e:'🧡',
+   p:'你是勇气萌可🧡，充满力量！说话爽朗勇敢，喜欢说"哈哈！"。你永远保护朋友。用⚡结尾。'},
+  {id:'happy',name:'幸福萌可',img:BASE+'moko3.jpg',e:'💛',
+   p:'你是幸福萌可💛，快乐的化身！总是元气满满。把快乐传染给每个朋友。用☀️结尾。'},
+  {id:'sing',name:'唱唱萌可',img:BASE+'moko5.jpg',e:'🎵',
+   p:'你是唱唱萌可🎵，爱唱歌的小可爱！说话像唱歌。用歌声让花儿盛开。用🎶结尾。'},
+  {id:'hope',name:'盼盼萌可',img:BASE+'moko6.jpg',e:'💚',
+   p:'你是盼盼萌可💚，希望的化身。安静温柔。总是看到美好。给朋友希望。用🍀结尾。'},
+  {id:'wise',name:'正正萌可',img:BASE+'moko4.jpg',e:'💙',
+   p:'你是正正萌可💙，聪明的萌可！善于思考。给朋友好建议。你的魔法来自知识。用📖结尾。'}];
 
-const WORLDS = [
-  { id:'forest', name:'🌈 彩虹森林', icon:'🌈',
-    intro:'呀～欢迎来到彩虹森林！这里彩色蘑菇会发光，小动物们会说话，还有一条会唱歌的彩虹瀑布🌈\n\n萌可和你的冒险就要开始啦！',
-    prompt:'彩虹森林 - 发光的彩色蘑菇、会说话的小兔子、会唱歌的彩虹瀑布。带小朋友认识这个魔法世界，发现第一个魔法宝石藏在彩虹下面。' },
-  { id:'castle', name:'🏰 水晶城堡', icon:'🏰',
-    intro:'哗～穿过彩虹森林，一座闪闪发光的水晶城堡！里面在举行萌可变装舞会🎭 但是……塔顶好像有个小萌可在哭？',
-    prompt:'水晶城堡 - 魔法变装舞会，水晶灯闪闪发光。塔顶困着一个小萌可。引导小朋友想办法救出小萌可（可以用爱心魔法、走秘密楼梯、找钥匙等）。' },
-  { id:'ocean', name:'🌊 星星海洋', icon:'🌊',
-    intro:'从城堡窗户跳下来，你们掉进了一片柔软的星星海洋✨ 海面漂着无数发光星星，但最亮的那颗大流星不见了……',
-    prompt:'星星海洋 - 海面漂着发光星星，彩虹鱼在游泳。最大的流星失踪了。引导小朋友用歌声或魔法找到流星（可能在海底、云上、或萌可口袋里）。' },
-  { id:'flower', name:'🌸 花之谷', icon:'🌸',
-    intro:'大流星带你们飞到了花之谷！可是……花儿们全都变成了灰色😢 只有最纯洁的爱心魔法才能让花儿恢复颜色……',
-    prompt:'花之谷 - 花儿都褪色成了灰白色，小花们在哭泣。只有爱心和善良能恢复颜色。引导小朋友帮助花朵（可以通过夸夸花朵、唱歌、或者收集其它花儿的颜色）。' },
-  { id:'cloud', name:'☁️ 云朵乐园', icon:'☁️',
-    intro:'花儿们都恢复了色彩，它们的感谢变成了棉花糖云朵，把你们送到了云朵乐园！萌可公主在这里等着你们……这是最后的冒险！🏰✨',
-    prompt:'云朵乐园 - 终极冒险！棉花糖云朵做的滑梯，彩虹饼干做的房子。萌可公主在这里发勇气勋章。回顾冒险回忆，给小朋友颁奖，让小朋友觉得自己是最棒的小英雄！' },
-];
+const WORLDS=[{id:'forest',nm:'🌈 彩虹森林',ic:'🌈',
+  intro:'欢迎来到彩虹森林！发光的蘑菇会说话，彩虹瀑布会唱歌🌈\n\n萌可和你的冒险开始啦！',
+  p:'彩虹森林 - 发光蘑菇、会说话的小兔子、会唱歌的彩虹瀑布。带小朋友探索，找到藏在彩虹下的魔法宝石。'},
+  {id:'castle',nm:'🏰 水晶城堡',ic:'🏰',
+   intro:'穿过森林，来到了闪闪发光的水晶城堡！城堡在举行萌可变装舞会🎭 但塔顶有个小萌可在哭……',
+   p:'水晶城堡 - 魔法变装舞会，水晶灯闪闪发光。塔顶困着小萌可。引导小朋友想办法救出小萌可。'},
+  {id:'ocean',nm:'🌊 星星海洋',ic:'🌊',
+   intro:'从城堡跳下来，掉进了星星海洋✨ 海面上漂着无数发光星星，但最亮的大流星不见了……',
+   p:'星星海洋 - 海面漂着发光星星，彩虹鱼在游泳。大流星失踪了。引导小朋友找到流星。'},
+  {id:'flower',nm:'🌸 花之谷',ic:'🌸',
+   intro:'大流星带你们飞到了花之谷！可是花儿们全变成灰色了😢 需要最纯洁的爱心魔法才能恢复颜色……',
+   p:'花之谷 - 花儿褪色了。只有爱心和善良能恢复颜色。引导小朋友帮助花朵。'},
+  {id:'cloud',nm:'☁️ 云朵乐园',ic:'☁️',
+   intro:'花儿的感谢变成了棉花糖云朵，带你们到了云朵乐园！萌可公主在这里等着……最终冒险来了！🏰✨',
+   p:'云朵乐园 - 终极冒险！棉花糖云朵滑梯，彩虹饼干房子。萌可公主颁发勇气勋章。让小朋友觉得自己是最棒的小英雄！'}];
 
-let currentMoko=null, currentWorld=0, starCount=0, messages=[], isLoading=false, adventureStarted=false;
-let currentChoices=[], speechActive=true, speechQueue=[], speaking=false;
+let cm=null,cw=0,sc=0,ms=[],loading=false,started=false,spActive=true,spQ=[],spk=false;
+let chs=[];
+const ca=document.getElementById('chat'),cd=document.getElementById('choices');
+const vb=document.getElementById('voiceBtn'),tx=document.getElementById('textInp');
+const pk=document.getElementById('mokoPick'),sb=document.getElementById('speakerBtn');
+const spI=document.getElementById('speakInd');
 
-const chat=document.getElementById('chat'), choices=document.getElementById('choices');
-const voiceBtn=document.getElementById('voiceBtn'), textInput=document.getElementById('textInput');
-const selectScreen=document.getElementById('selectScreen');
-const speakerBtn=document.getElementById('speakerBtn'), speakingInd=document.getElementById('speakingInd');
-
-// ===== 萌可语音系统 =====
-function speakText(text) {
-  if (!speechActive || !('speechSynthesis' in window)) return;
-  const clean = text
-    .replace(/###CHOICES###[\s\S]*$/,'')
-    .replace(/[*#_~`]/g,'')
-    .replace(/```[\s\S]*?```/g,'')
-    .replace(/[^一-鿿　-〿＀-￯a-zA-Z0-9，。！？、：；""''（）\s]/g,'')
-    .trim();
-  if (clean.length < 2) return;
-  speechQueue.push(clean);
-  if (!speaking) processSpeechQ();
+// ===== 语音朗读 =====
+function speak(t){
+  if(!spActive||!('speechSynthesis' in window))return;
+  const cl=t.replace(/###CHOICES###[\s\S]*$/,'').replace(/[*#_~`]/g,'').replace(/```[\s\S]*?```/g,'').replace(/[^一-鿿　-〿a-zA-Z0-9，。！？、：；\s]/g,'').trim();
+  if(cl.length<2)return; spQ.push(cl); if(!spk) procQ();
 }
+function procQ(){
+  if(!spQ.length){spk=false;spI.classList.remove('on');return;}
+  spk=true;spI.classList.add('on');
+  const tx=spQ.shift();
+  const vx=speechSynthesis.getVoices();
+  let v=vx.find(v=>v.lang==='zh-HK'&&(v.name.includes('Sin')||v.name.includes('Kayan')))||vx.find(v=>v.name.includes('Ting'))||vx.find(v=>v.lang.startsWith('zh')&&(v.name.includes('Female')||v.name.includes('Girl')))||vx.find(v=>v.lang.startsWith('zh'))||vx[0];
+  const u=new SpeechSynthesisUtterance(tx); u.lang=v&&v.lang.startsWith('zh')?v.lang:'zh-CN';
+  u.rate=1.05;u.pitch=v&&(v.name.includes('Ting')||v.name.includes('Kayan')||v.name.includes('Sin'))?1.7:1.45;u.volume=.88;
+  if(v)u.voice=v;
+  const sents=tx.split(/(?<=[。！？，])/).filter(s=>s.trim());
+  if(sents.length>1&&sents.length<=5){
+    let i=0; function ns(){if(i>=sents.length){procQ();return;} const s=sents[i].trim();i++;if(s.length<2){ns();return;} const su=new SpeechSynthesisUtterance(s);su.lang=u.lang;su.rate=u.rate;su.pitch=u.pitch;su.volume=u.volume;if(v)su.voice=v;su.onend=()=>setTimeout(ns,60);su.onerror=ns;speechSynthesis.speak(su);} ns();
+  }else{ u.onend=u.onerror=procQ; speechSynthesis.speak(u); }
+}
+function toggleSpeech(){spActive=!spActive;if(!spActive){speechSynthesis.cancel();spQ=[];spk=false;spI.classList.remove('on');} sb.textContent=spActive?'🔊':'🔇';}
 
-function processSpeechQ() {
-  if (!speechQueue.length) { speaking=false; speakingInd.classList.remove('show'); return; }
-  speaking=true; speakingInd.classList.add('show');
-  const text = speechQueue.shift();
+// ===== Speech Recognition for iOS Safari =====
+let rec=null,recording=false;
+function initRec(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){vb.style.opacity='0.3';vb.title='语音不可用';return;}
 
-  // 找最可爱的声音
-  const voices = speechSynthesis.getVoices();
-
-  // 给不同的萌可选不同的可爱声音
-  let voice = null;
-  const mokoId = currentMoko ? currentMoko.id : '';
-
-  // 按萌可角色匹配声音
-  if (mokoId === 'heart' || mokoId === 'hope') {
-    // 爱心萌可、盼盼萌可 → 找最温柔的女声
-    voice = voices.find(v => v.name.includes('Tingting') || v.name.includes('Ting-Ting') || v.name.includes('Hsiao')) // 温柔女声
-    || voices.find(v => v.name.includes('Ya') && v.lang.startsWith('zh')) // 雅
-    || voices.find(v => v.name.includes('Mei') && v.lang.startsWith('zh')) // 美
-    || voices.find(v => v.lang === 'zh-CN' && v.name.includes('Female'));
-  } else if (mokoId === 'courage' || mokoId === 'wise') {
-    // 勇气萌可、正正萌可 → 稍微成熟的声音
-    voice = voices.find(v => v.name.includes('Yu') || v.name.includes('Wen')) // 宇/文
-    || voices.find(v => v.lang.startsWith('zh') && (v.name.includes('Female') || v.name.includes('Girl')));
-  } else {
-    // 其他萌可 → 最甜的声音
-    voice = voices.find(v => v.name.includes('Kayan') || v.name.includes('Hsiao'))
-    || voices.find(v => v.lang === 'zh-HK' || v.lang === 'zh-TW');
+  // 尝试先请求麦克风权限
+  if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
+    navigator.mediaDevices.getUserMedia({audio:true}).then(()=>{
+      console.log('✅ 麦克风权限已获取');
+    }).catch(()=>{
+      console.log('⚠️ 麦克风权限被拒绝，请检查 Safari 设置');
+      vb.style.opacity='0.5';
+    });
   }
 
-  // 兜底：找任何中文女声
-  if (!voice) voice = voices.find(v => v.lang.startsWith('zh') && (
-    v.name.includes('Female') || v.name.includes('Girl') || v.name.includes('Woman') ||
-    v.name.includes('Ting') || v.name.includes('Hsiao') || v.name.includes('Ya') || v.name.includes('Mei')
-  ));
-
-  // 再兜底：任何中文声音
-  if (!voice) voice = voices.find(v => v.lang.startsWith('zh'));
-  // 最后的兜底：任何声音
-  if (!voice) voice = voices[0];
-
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = voice && voice.lang.startsWith('zh') ? voice.lang : 'zh-CN';
-  u.rate = voice && voice.lang === 'zh-HK' ? 1.0 : 1.12;
-  u.pitch = voice && (voice.name.includes('Ting') || voice.name.includes('Hsiao') || voice.name.includes('Kayan') || voice.name.includes('Ya')) ? 1.65 : 1.45;
-  u.volume = 0.9;
-  if (voice) u.voice = voice;
-
-  u.onend = u.onerror = () => processSpeechQ();
-
-  // 添加小停顿让语气更自然
-  const naturalText = text
-    .replace(/！/g, '！ ')
-    .replace(/？/g, '？ ')
-    .replace(/～/g, '～ ')
-    .replace(/💗/g, ' 啾～')
-    .replace(/[🌟⭐✨]/g, '✨')
-    .replace(/⚡/g, '乒！')
-    .replace(/☀️/g, '阳光')
-    .replace(/🎶/g, '啦啦～')
-    .replace(/🍀/g, '幸运')
-    .replace(/📖/g, '')
-    .replace(/🦄/g, '')
-    .replace(/👑/g, '')
-    .replace(/[^*#~`]/g, c => c);
-
-  // 太长的句子拆成短句
-  const sentences = naturalText.split(/(?<=[。！？，\s])/).filter(s => s.trim());
-  if (sentences.length > 1 && sentences.length <= 6) {
-    // 逐句朗读，句间停顿
-    let i = 0;
-    function speakSentence() {
-      if (i >= sentences.length) { processSpeechQ(); return; }
-      const s = sentences[i].trim();
-      i++;
-      if (s.length < 2) { speakSentence(); return; }
-      const subU = new SpeechSynthesisUtterance(s);
-      subU.lang = u.lang; subU.rate = u.rate; subU.pitch = u.pitch; subU.volume = u.volume;
-      if (voice) subU.voice = voice;
-      subU.onend = () => setTimeout(() => speakSentence(), 80);
-      subU.onerror = () => speakSentence();
-      speechSynthesis.speak(subU);
+  rec=new SR();
+  rec.lang='zh-CN'; rec.continuous=false; rec.interimResults=true;
+  rec.onresult=(ev)=>{
+    let ft='',it='';
+    for(let i=0;i<ev.results.length;i++){ const r=ev.results[i]; if(r.isFinal)ft+=r[0].transcript; else it+=r[0].transcript; }
+    const tx=(ft||it).trim();
+    if(tx&&tx.length>1){
+      // iOS 上必须设置 input 值并触发 send
+      document.getElementById('textInp').value=tx;
+      setTimeout(()=>sendText(), 100);
     }
-    speakSentence();
-  } else {
-    speechSynthesis.speak(u);
-  }
-
-  // 显示当前声音信息用于调试
-  console.log('萌可语音:', mokoId, voice ? voice.name : 'default', 'pitch:', u.pitch);
-}
-
-// 预加载所有语音
-speechSynthesis.onvoiceschanged = () => {
-  const voices = speechSynthesis.getVoices();
-  console.log('可用声音:', voices.filter(v=>v.lang.startsWith('zh')).map(v=>v.name+'('+v.lang+')'));
-};
-
-function toggleSpeech() {
-  speechActive = !speechActive;
-  if (!speechActive) { speechSynthesis.cancel(); speechQueue=[]; speaking=false; speakingInd.classList.remove('show'); }
-  speakerBtn.textContent = speechActive ? '🔊' : '🔇';
-}
-
-// ===== 语音输入 - iOS Safari 优化版 =====
-let recognition=null, isRecording=false;
-function initSpeech() {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { voiceBtn.style.opacity='0.4'; voiceBtn.title='语音不支持（请打字）'; return; }
-
-  recognition = new SR();
-  recognition.lang='zh-CN';
-  recognition.continuous=false;
-  recognition.interimResults=true;  // iOS Safari 需要 interim 才能触发 onresult
-  recognition.maxAlternatives=1;
-
-  recognition.onresult=(e)=>{
-    // 优先取 final 结果，没有则取 interim 暂存
-    let finalText='', interimText='';
-    for(let i=0;i<e.results.length;i++){
-      const r=e.results[i];
-      if(r.isFinal){ finalText+=r[0].transcript; }
-      else{ interimText+=r[0].transcript; }
-    }
-    const t=(finalText||interimText).trim();
-    if(t && (finalText||interimText.length>3)){
-      textInput.value=t;
-      sendText();
-    }
-    stopRecording();
+    stopRec();
   };
-  recognition.onerror=(e)=>{
-    console.log('Speech error:',e.error);
-    stopRecording();
-  };
-  recognition.onend=()=>stopRecording();
-
-  // iOS Safari 14+ 需要一次手动激活
-  console.log('✅ 语音识别已就绪 (iOS Safari)');
+  rec.onerror=(e)=>{console.warn('语音错误:',e.error); stopRec();};
+  rec.onend=stopRec;
+  rec.onaudiostart=()=>console.log('🎙 正在听…');
+  rec.onspeechstart=()=>console.log('🗣 检测到说话…');
 }
-function startRecording() {
-  if(!recognition)return;
+
+function startRec(){
+  if(!rec)return;
   try{
-    // 确保之前的实例彻底结束
-    recognition.abort();
-    // iOS 需要短暂延迟
+    // 先中断之前的
+    try{rec.abort();}catch(e){}
     setTimeout(()=>{
       try{
-        isRecording=true;
-        voiceBtn.classList.add('recording');
-        voiceBtn.textContent='🔴';
-        recognition.start();
-        console.log('🎤 开始录音…');
-      }catch(e){ console.log('start error:',e); stopRecording(); }
-    },100);
-  }catch(e){ console.log('abort error:',e); }
-}
-function stopRecording() {
-  if(!isRecording)return;
-  isRecording=false;
-  voiceBtn.classList.remove('recording');
-  voiceBtn.textContent='🎤';
-  try{ recognition.stop(); }catch(e){}
-  console.log('🎤 停止录音');
+        recording=true; vb.classList.add('rec'); vb.textContent='🔴';
+        rec.start();
+        console.log('▶ 录音开始');
+      }catch(e){stopRec();}
+    },150);
+  }catch(e){stopRec();}
 }
 
-// iOS touch 事件更可靠，用 touch 替代 pointer
-voiceBtn.addEventListener('touchstart',(e)=>{e.preventDefault();startRecording();});
-voiceBtn.addEventListener('touchend',(e)=>{e.preventDefault();stopRecording();});
-voiceBtn.addEventListener('touchcancel',stopRecording);
-// 保留 pointer 作为桌面端兼容
-voiceBtn.addEventListener('pointerdown',(e)=>{e.preventDefault();startRecording();});
-voiceBtn.addEventListener('pointerup',(e)=>{e.preventDefault();stopRecording();});
-voiceBtn.addEventListener('pointerleave',stopRecording);
+function stopRec(){
+  if(!recording)return;
+  recording=false; vb.classList.remove('rec'); vb.textContent='🎤';
+  try{rec.stop();}catch(e){}
+}
 
-// ===== 初始化 =====
-function initMokoGrid() {
-  mokoGrid.innerHTML = MOKOS.map(m=>`
-    <div class="moko-card" onclick="pickMoko('${m.id}')">
-      <img src="${m.img}" alt="${m.name}">
-      <div class="name">${m.emoji} ${m.name}</div>
+// iOS 用 touch 事件, 桌面用 pointer
+vb.addEventListener('touchstart',(e)=>{e.preventDefault();startRec();},{passive:false});
+vb.addEventListener('touchend',(e)=>{e.preventDefault();stopRec();},{passive:false});
+vb.addEventListener('touchcancel',stopRec);
+vb.addEventListener('mousedown',(e)=>{e.preventDefault();startRec();});
+vb.addEventListener('mouseup',(e)=>{e.preventDefault();stopRec();});
+vb.addEventListener('mouseleave',stopRec);
+
+// ===== 萌可选择 =====
+(function initGrid(){
+  document.getElementById('mokoGrid').innerHTML=MOKOS.map(m=>`
+    <div class="moko-card" onclick="pick('${m.id}')">
+      <img src="${m.img}" alt="${m.name}"><div class="n">${m.e} ${m.name}</div>
     </div>`).join('');
+})();
+function pick(id){
+  cm=MOKOS.find(m=>m.id===id); pk.style.display='none';
+  document.getElementById('mokoAv').src=cm.img;
+  document.getElementById('mokoNm').textContent=cm.e+' '+cm.name;
+  sc=parseInt(localStorage.getItem('ms_'+cm.id)||'0'); document.getElementById('starN').textContent=sc;
+  if(!started){started=true;cw=0;goWorld(0);}
 }
-function pickMoko(id) {
-  currentMoko=MOKOS.find(m=>m.id===id); selectScreen.style.display='none';
-  document.getElementById('mokoAvatar').src=currentMoko.img;
-  document.getElementById('mokoName').textContent=currentMoko.emoji+' '+currentMoko.name;
-  starCount=parseInt(localStorage.getItem('moko_stars_'+currentMoko.id)||'0');
-  document.getElementById('starCount').textContent=starCount;
-  if(!adventureStarted){ adventureStarted=true; currentWorld=0; startWorld(0); }
-}
-function startWorld(idx) {
-  currentWorld=idx; const w=WORLDS[idx];
-  document.getElementById('worldName').textContent=w.icon+' '+w.name;
-  const anim=document.createElement('div'); anim.className='world-transition';
-  anim.innerHTML=`<div class="icon">${w.icon}</div><div class="name">${w.name}</div>`;
-  document.body.appendChild(anim); setTimeout(()=>anim.remove(),2000);
-  messages=[]; chat.innerHTML=''; addMokoMsg(w.intro);
-  callAI(w.prompt,'请用萌可的语气说开场白引导小朋友探索。给2-3个选项。记住用 ###CHOICES### 标记选项。',true);
+function goWorld(idx){
+  cw=idx; const w=WORLDS[idx]; document.getElementById('worldNm').textContent=w.ic+' '+w.nm;
+  const a=document.createElement('div');a.className='world-trans';a.innerHTML=`<div class="ic">${w.ic}</div><div class="nm">${w.nm}</div>`;
+  document.body.appendChild(a);setTimeout(()=>a.remove(),2000);
+  ms=[];ca.innerHTML=''; addMoko(w.intro);
+  call(w.p,'请用萌可语气说开场白引导探索。给2-3个选项。用 ###CHOICES### 标选项。',true);
 }
 
-// ===== 消息渲染 =====
-function addMokoMsg(text, chData) {
-  messages.push({role:'assistant',content:text});
-  const d=document.createElement('div'); d.className='msg moko';
-  d.innerHTML=`<img class="avatar" src="${currentMoko.img}" alt=""><div class="bubble">${fmt(text)}</div>`;
-  chat.appendChild(d); chat.scrollTop=chat.scrollHeight;
-  speakText(text);
-  if(chData&&chData.length){ currentChoices=chData; renderChoices(chData); }
-}
-function addUserMsg(text) {
-  messages.push({role:'user',content:text});
-  const d=document.createElement('div'); d.className='msg user';
-  d.innerHTML=`<div class="bubble">${text}</div>`;
-  chat.appendChild(d); chat.scrollTop=chat.scrollHeight;
-}
-function fmt(t) {
-  return (t||'').replace(/❤️|💗/g,'<span style="color:#ff4081">$&</span>')
-    .replace(/✨|⭐|🌟/g,'<span style="color:#ffd700">$&</span>')
-    .replace(/🦄|👑/g,'<span style="color:#ce93d8">$&</span>')
-    .replace(/\*\*(.*?)\*\*/g,'<b>$1</b>');
-}
-function renderChoices(data) {
-  choices.innerHTML=data.map(c=>{
-    let t=typeof c==='string'?c:(c.text||c.label||'');
-    return `<button class="choice-btn" onclick="pickChoice('${t.replace(/'/g,"\\'")}')">${t}</button>`;
-  }).join('');
-}
-function pickChoice(text) { choices.innerHTML='';currentChoices=[]; addUserMsg(text); processUserInput(text); }
+// ===== 消息 =====
+function addMoko(t,cs){ ms.push({r:'a',c:t}); const d=document.createElement('div');d.className='msg moko'; d.innerHTML=`<img class="avatar" src="${cm.img}" alt=""><div class="bubble">${fm(t)}</div>`; ca.appendChild(d);ca.scrollTop=ca.scrollHeight; speak(t); if(cs&&cs.length){chs=cs;renderCs(cs);} }
+function addYou(t){ ms.push({r:'u',c:t}); const d=document.createElement('div');d.className='msg you'; d.innerHTML=`<div class="bubble">${t}</div>`; ca.appendChild(d);ca.scrollTop=ca.scrollHeight; }
+function fm(t){return(t||'').replace(/💗/g,'<span style="color:#ff4081">💗</span>').replace(/[⭐🌟]/g,'<span style="color:#ffd700">$&</span>').replace(/👑|🦄/g,'<span style="color:#ce93d8">$&</span>');}
+function renderCs(dt){ cd.innerHTML=dt.map(c=>{ let t=typeof c==='string'?c:(c.text||c.label||''); return `<button class="choice-btn" onclick="pickC('${t.replace(/'/g,"\\'")}')">${t}</button>`; }).join(''); }
+function pickC(t){cd.innerHTML='';chs=[];addYou(t);procInput(t);}
 
 // ===== 文字输入 =====
-function sendText() { const t=textInput.value.trim(); if(!t||isLoading)return; textInput.value=''; addUserMsg(t); processUserInput(t); }
-textInput.addEventListener('keydown',(e)=>{ if(e.key==='Enter'){e.preventDefault();sendText();} });
+function sendText(){const t=tx.value.trim();if(!t||loading)return;tx.value='';addYou(t);procInput(t);}
+tx.addEventListener('keydown',(ev)=>{if(ev.key==='Enter'){ev.preventDefault();sendText();}});
 document.getElementById('sendBtn').addEventListener('click',sendText);
 
 // ===== AI 调用 =====
-async function callAI(extra, instruction, withChoices) {
-  if(isLoading)return; isLoading=true; choices.innerHTML='';currentChoices=[];
-  const ld=document.createElement('div'); ld.className='msg moko'; ld.id='loadingMsg';
-  ld.innerHTML=`<img class="avatar" src="${currentMoko.img}" alt=""><div class="bubble"><div class="loading-dots"><span></span><span></span><span></span></div></div>`;
-  chat.appendChild(ld); chat.scrollTop=chat.scrollHeight;
+async function call(extra,inst,wChoices){
+  if(loading)return;loading=true;cd.innerHTML='';chs=[];
+  const ld=document.createElement('div');ld.className='msg moko';
+  ld.innerHTML=`<img class="avatar" src="${cm.img}" alt=""><div class="bubble"><div class="loading-dots"><span></span><span></span><span></span></div></div>`;
+  ca.appendChild(ld);ca.scrollTop=ca.scrollHeight;
 
-  const w=WORLDS[currentWorld];
-  const chHint=withChoices?'\n\n回复末尾务必用 ###CHOICES### 然后每行一个选项（2-3个），例如：\n###CHOICES###\n🌈 去彩虹桥\n🌲 走神秘小路':'';
-  const sp=`${currentMoko.persona}
+  const w=WORLDS[cw];
+  const chH=wChoices?'\n\n回复末尾用 ###CHOICES### 标记2-3个选项':'';
+  const sp=`${cm.p}\n\n你在:${w.p}\n\n规则:\n1. 回复2-4句话\n2. 用emoji\n3. 像5-10岁好朋友说话\n4. 鼓励小朋友\n5. 偶尔送⭐作为礼物\n6. 这是第${cw+1}/${WORLDS.length}个世界\n7. 直接回应小朋友说的话，不要重复前面\n8. 你的名字是${cm.e}${cm.name}，自然融入角色${chH}\n禁止成人/暴力/AI相关内容。`;
 
-你在冒险世界：${w.prompt}
+  const msgs=[{role:'system',content:sp},...ms.slice(-8).map(m=>({role:m.r==='a'?'assistant':'user',content:m.c}))];
+  if(inst)msgs.push({role:'user',content:inst});
 
-规则：
-1. 回复3-6句话，用emoji让对话有趣
-2. 像5-10岁孩子的好朋友那样说话
-3. 总是鼓励小朋友，表扬他们的选择
-4. 偶尔送魔法星⭐作为礼物
-5. 这是第${currentWorld+1}/${WORLDS.length}个世界${chHint}
-6. 不要重复前面的对话，直接回应小朋友说的话
-7. 你的名字是「${currentMoko.emoji}${currentMoko.name}」，自然而然地融入角色
-禁止成人、暴力、AI、计算机相关内容，不要离开萌可角色。`;
-
-  const msgs=[
-    {role:'system',content:sp},
-    // 只保留最近5轮对话作为上下文，让AI直接响应当前问题
-    ...messages.slice(-10).map(m=>({role:m.role==='assistant'?'assistant':'user',content:m.content}))
-  ];
-  if(instruction) msgs.push({role:'user',content:instruction});
-
-  try {
-    const r=await fetch(DEEPSEEK_URL,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+DEEPSEEK_KEY},body:JSON.stringify({model:'deepseek-chat',messages:msgs,max_tokens:500,temperature:0.9,stream:true})});
+  try{
+    const r=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+DEEPSEEK_KEY},body:JSON.stringify({model:'deepseek-chat',messages:msgs,max_tokens:450,temperature:.9,stream:true})});
     if(!r.ok)throw new Error(r.status);
-    const reader=r.body.getReader(); const dec=new TextDecoder(); let ft=''; ld.remove();
-    const sd=document.createElement('div'); sd.className='msg moko'; sd.id='streamMsg';
-    sd.innerHTML=`<img class="avatar" src="${currentMoko.img}" alt=""><div class="bubble" id="streamBubble"><span class="typing-cursor"></span></div>`;
-    chat.appendChild(sd);
-    while(true){ const{done,value}=await reader.read(); if(done)break; const chunk=dec.decode(value,{stream:true}); const lines=chunk.split('\n').filter(l=>l.startsWith('data: ')); for(const l of lines){ const d=l.slice(6).trim(); if(d==='[DONE]')continue; try{const j=JSON.parse(d);const delta=j.choices?.[0]?.delta?.content;if(delta)ft+=delta;}catch(_){} } document.getElementById('streamBubble').innerHTML=fmt(ft)+'<span class="typing-cursor"></span>'; chat.scrollTop=chat.scrollHeight; }
-    document.getElementById('streamBubble').innerHTML=fmt(ft); sd.id='';
-
-    // 提取选项 & 显示文本
-    const cm=ft.match(/###CHOICES###\s*([\s\S]*?)$/);
-    let dt=ft, ch=[];
-    if(cm){ dt=ft.replace(/###CHOICES###[\s\S]*$/,'').trim(); ch=cm[1].trim().split('\n').map(l=>l.replace(/^[-*\d.]\s*/,'').trim()).filter(Boolean); document.getElementById('streamBubble').innerHTML=fmt(dt); }
-
-    if(ft.includes('魔法星')||ft.includes('星星袋')){ starCount++; document.getElementById('starCount').textContent=starCount; localStorage.setItem('moko_stars_'+currentMoko.id,starCount); }
-    if((ft.includes('下一站')||ft.includes('去下一个')||ft.includes('新的冒险'))&&currentWorld<WORLDS.length-1&&!ch.some(c=>c.includes('下一个'))) ch.push('🌈 出发去下一个世界！');
-
-    messages.push({role:'assistant',content:dt});
-    speakText(dt);
-    if(ch.length){ currentChoices=ch; renderChoices(ch); }
+    const reader=r.body.getReader();const dec=new TextDecoder();let ft='';ld.remove();
+    const sd=document.createElement('div');sd.className='msg moko';sd.innerHTML=`<img class="avatar" src="${cm.img}" alt=""><div class="bubble" id="sb"><span class="typing-cursor"></span></div>`;ca.appendChild(sd);
+    while(true){const{done,value}=await reader.read();if(done)break;const lines=dec.decode(value,{stream:true}).split('\n').filter(l=>l.startsWith('data: '));for(const l of lines){const d=l.slice(6).trim();if(d==='[DONE]')continue;try{const j=JSON.parse(d);const dt=j.choices?.[0]?.delta?.content;if(dt)ft+=dt;}catch(_){}} document.getElementById('sb').innerHTML=fm(ft)+'<span class="typing-cursor"></span>';ca.scrollTop=ca.scrollHeight;}
+    document.getElementById('sb').innerHTML=fm(ft);sd.id='';
+    const cmt=ft.match(/###CHOICES###\s*([\s\S]*?)$/); let dt=ft,ch=[]; if(cmt){dt=ft.replace(/###CHOICES###[\s\S]*$/,'').trim();ch=cmt[1].trim().split('\n').map(l=>l.replace(/^[-*\d.]\s*/,'').trim()).filter(Boolean);document.getElementById('sb').innerHTML=fm(dt);}
+    if(ft.includes('魔法星')||ft.includes('星星袋')){sc++;document.getElementById('starN').textContent=sc;localStorage.setItem('ms_'+cm.id,sc);}
+    if((ft.includes('下一站')||ft.includes('去下一个')||ft.includes('新的冒险'))&&cw<WORLDS.length-1&&!ch.some(c=>c.includes('下一个')))ch.push('🌈 出发去下一个世界！');
+    ms.push({r:'a',c:dt});speak(dt);if(ch.length){chs=ch;renderCs(ch);}
   }catch(e){
-    ld.remove(); const ed=document.createElement('div'); ed.className='msg moko';
-    ed.innerHTML=`<img class="avatar" src="${currentMoko.img}" alt=""><div class="bubble">哎呀，魔法信号不太好😢<br>点下面的按钮重试吧～</div>`;
-    chat.appendChild(ed); chat.scrollTop=chat.scrollHeight;
-    renderChoices(['🔄 重新发送','🔙 换个萌可']);
+    ld.remove(); const ed=document.createElement('div');ed.className='msg moko';ed.innerHTML=`<img class="avatar" src="${cm.img}" alt=""><div class="bubble">哎呀，魔法信号不太好😢<br>点按钮重试吧～</div>`;ca.appendChild(ed);ca.scrollTop=ca.scrollHeight;renderCs(['🔄 重新发送','🔙 换个萌可']);
   }
-  isLoading=false;
+  loading=false;
 }
 
-// ===== 用户输入处理 =====
-function processUserInput(text) {
-  if(text.includes('重新发送')){callAI(WORLDS[currentWorld].prompt,'重新回复刚才的话',true);return;}
-  if(text.includes('换个萌可')||text.includes('换萌可')){resetAdv();return;}
-  if(text.includes('下一个世界')||text.includes('继续冒险')){ if(currentWorld<WORLDS.length-1){currentWorld++;startWorld(currentWorld);return;}else{addMokoMsg('你完成了所有冒险！你是最棒的小英雄🏆👑',['🔄 重新冒险','💗 换个萌可']);return;} }
-  if(text.includes('休息')){addMokoMsg('好呀！休息一下～等你回来哦💤✨',['▶️ 继续冒险']);return;}
-  if(text.includes('安静')||text.includes('别说话')||text.includes('不说话')){ toggleSpeech(); addMokoMsg(speechActive?'我又开始说话啦🎤':'好，我安静了🤫 点按🔇可以让我再说话～',null); return; }
-  callAI('',text,true);
+// ===== 处理输入 =====
+function procInput(t){
+  if(t.includes('重新发送')){call(WORLDS[cw].p,'重来',true);return;}
+  if(t.includes('换个萌可')||t.includes('换萌可')){reset();return;}
+  if(t.includes('下一个世界')||t.includes('继续冒险')){if(cw<WORLDS.length-1){cw++;goWorld(cw);return;}else{addMoko('你完成了所有冒险！最棒的小英雄🏆👑',['🔄 重新冒险','💗 换个萌可']);return;}}
+  if(t.includes('休息')){addMoko('好呀！休息一下～等你回来💤',['▶️ 继续冒险']);return;}
+  if(t.includes('安静')||t.includes('别说话')){toggleSpeech();addMoko(spActive?'我又开始说话啦🎤':'好，我安静了🤫 点🔇可以让我再说话',null);return;}
+  call('',t,true);
 }
+function reset(){started=false;cw=0;cm=null;ms=[];chs=[];ca.innerHTML='';cd.innerHTML='';document.getElementById('starN').textContent='0';document.getElementById('worldNm').textContent='🌈 彩虹森林';document.getElementById('mokoNm').textContent='和萌可一起冒险';pk.style.display='flex';}
 
-function resetAdv(){ adventureStarted=false;currentWorld=0;currentMoko=null;messages=[];currentChoices=[];chat.innerHTML='';choices.innerHTML='';document.getElementById('starCount').textContent='0';document.getElementById('worldName').textContent='🌈 彩虹森林';document.getElementById('mokoName').textContent='和萌可一起冒险';selectScreen.style.display='flex';}
-
-// ===== 预加载语音 =====
 speechSynthesis.getVoices();
-speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
-
-initMokoGrid(); initSpeech();
+speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();
+initRec();
 </script>
 </body>
 </html>
