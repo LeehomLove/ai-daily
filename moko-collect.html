@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#ff69b4">
+<title>✨ 萌可收集挑战 ✨</title>
+<style>
+  :root { --safe-bottom: env(safe-area-inset-bottom, 16px); }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: linear-gradient(180deg, #fce4ec 0%, #f3e5f5 25%, #ede7f6 50%, #e8eaf6 80%, #bbdefb 100%);
+    min-height: 100vh; overflow: hidden;
+    touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+    user-select: none; -webkit-user-select: none;
+  }
+  .bg-stars {
+    position: fixed; inset:0; pointer-events:none; z-index:0;
+    background-image:
+      radial-gradient(2px 2px at 10% 15%, rgba(255,255,255,.9), transparent),
+      radial-gradient(3px 3px at 25% 25%, rgba(255,215,0,.7), transparent),
+      radial-gradient(2px 2px at 60% 30%, rgba(255,192,203,.8), transparent),
+      radial-gradient(3px 3px at 75% 20%, rgba(255,255,255,.7), transparent),
+      radial-gradient(2px 2px at 90% 35%, rgba(255,215,0,.6), transparent),
+      radial-gradient(2px 2px at 15% 80%, rgba(255,255,255,.8), transparent),
+      radial-gradient(120px 120px at 20% 40%, rgba(255,182,193,.12), transparent),
+      radial-gradient(100px 100px at 80% 55%, rgba(186,104,200,.08), transparent);
+  }
+  .float-el {
+    position: fixed; pointer-events:none; z-index:0; opacity:0.35;
+    animation: floatUp var(--dur) ease-in infinite; animation-delay: var(--delay);
+    font-size: var(--sz);
+  }
+  @keyframes floatUp {
+    0% { transform: translateY(0) rotate(0deg) scale(0); opacity:0; }
+    15% { opacity:0.5; transform: translateY(-15px) rotate(15deg) scale(1); }
+    85% { opacity:0.2; }
+    100% { transform: translateY(-100px) rotate(50deg) scale(0.2); opacity:0; }
+  }
+  .main { position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; min-height:100vh; padding:0 14px var(--safe-bottom) 14px; }
+  .title-row { text-align:center; padding:14px 0 2px; }
+  .title-emoji { font-size:36px; animation: bounce 1s ease infinite; display:block; }
+  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  .title-txt { font-size:24px; font-weight:900; letter-spacing:3px;
+    background: linear-gradient(135deg, #ec407a, #ab47bc, #5c6bc0);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  }
+  .title-sub { font-size:12px; color:#ce93d8; }
+
+  .score-bar { display:flex; gap:18px; align-items:center; padding:10px 22px; background:rgba(255,255,255,.75); backdrop-filter:blur(10px); border-radius:28px; margin:6px 0; box-shadow:0 2px 12px rgba(156,39,176,.08); }
+  .score-item { display:flex; align-items:center; gap:5px; font-size:14px; font-weight:700; }
+  .score-num { font-size:20px; background:linear-gradient(135deg, #ec407a, #f48fb1); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .badge { font-size:11px; background:#ce93d8; color:#fff; padding:2px 8px; border-radius:10px; font-weight:700; }
+
+  .game-area {
+    position:relative; width:100%; max-width:400px; flex:1; min-height:380px;
+    border-radius:28px; background:linear-gradient(180deg, rgba(255,255,255,.3) 0%, rgba(255,255,255,.1) 100%);
+    box-shadow:inset 0 0 50px rgba(255,255,255,.25); overflow:hidden; margin-bottom:4px;
+  }
+  .game-area::after { content:''; position:absolute; bottom:0; left:0; right:0; height:50px; background:linear-gradient(0deg, rgba(129,199,132,.2) 0%, transparent 100%); border-radius:0 0 28px 28px; pointer-events:none; z-index:0; }
+  .grass { position:absolute; bottom:6px; left:0; right:0; text-align:center; font-size:22px; pointer-events:none; z-index:0; letter-spacing:3px; opacity:.6; }
+
+  .timer-wrap { position:absolute; top:10px; right:10px; width:44px; height:44px; border-radius:50%; background:conic-gradient(#ec407a var(--prog,100%), rgba(255,255,255,.25) 0deg); display:flex; align-items:center; justify-content:center; z-index:10; }
+  .timer-inr { width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.85); display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:900; color:#ec407a; }
+  .progress-wrap { position:absolute; top:10px; left:10px; right:64px; height:18px; background:rgba(255,255,255,.5); border-radius:9px; overflow:hidden; z-index:10; }
+  .progress-bar { height:100%; border-radius:9px; background:linear-gradient(90deg, #f48fb1, #ce93d8, #ab47bc); transition:width .3s; width:0%; }
+  .progress-label { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#7b1fa2; }
+
+  .moko {
+    position:absolute; z-index:5; cursor:pointer;
+    animation: popIn .35s cubic-bezier(.68,-.55,.27,1.55);
+    filter:drop-shadow(0 3px 6px rgba(156,39,176,.25)); -webkit-tap-highlight-color:transparent;
+    display:flex; align-items:center; justify-content:center; flex-direction:column;
+  }
+  @keyframes popIn { 0%{transform:scale(0) rotate(-25deg); opacity:0} 100%{transform:scale(1) rotate(0deg); opacity:1} }
+  .moko:active { transform:scale(1.2) !important; }
+  .moko.popping { animation:popOut .3s ease forwards; pointer-events:none; }
+  @keyframes popOut { 0%{transform:scale(1); opacity:1} 50%{transform:scale(1.5) rotate(10deg); opacity:.6} 100%{transform:scale(0) rotate(-30deg); opacity:0} }
+  .moko.bad { animation:badPop .4s ease forwards; pointer-events:none; }
+  @keyframes badPop { 0%{transform:scale(1); opacity:1} 50%{transform:scale(.5); opacity:.5;filter:brightness(0)} 100%{transform:scale(1.2) rotate(180deg); opacity:0} }
+
+  .moko-name { font-size:10px; font-weight:700; margin-top:2px; text-align:center; white-space:nowrap; }
+  .score-pop { position:absolute; pointer-events:none; font-size:18px; font-weight:900; z-index:20; animation:scFloat .7s ease-out forwards; }
+  @keyframes scFloat { 0%{transform:translateY(0) scale(.5); opacity:1} 100%{transform:translateY(-60px) scale(1.2); opacity:0} }
+  .particle { position:absolute; pointer-events:none; font-size:12px; z-index:18; animation:pBurst .5s ease-out forwards; }
+  @keyframes pBurst { 0%{transform:translate(0,0) scale(1);opacity:1} 100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0} }
+
+  .btn-row { display:flex; gap:10px; margin-bottom:4px; flex-wrap:wrap; justify-content:center; }
+  .btn { padding:11px 22px; border-radius:22px; border:none; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; letter-spacing:1px; transition:all .15s; box-shadow:0 3px 12px rgba(156,39,176,.15); }
+  .btn:active { transform:scale(.94); }
+  .btn-start { background:linear-gradient(135deg, #f48fb1, #ce93d8); color:#fff; font-size:17px; padding:13px 34px; }
+  .btn-lv { background:rgba(255,255,255,.75); color:#7b1fa2; font-size:13px; padding:9px 16px; }
+  .btn-lv.active { background:#ce93d8; color:#fff; }
+
+  .modal-overlay { position:fixed; inset:0; z-index:100; background:rgba(0,0,0,.25); display:flex; align-items:center; justify-content:center; animation:fadeIn .25s; }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  .modal { background:#fff; border-radius:24px; padding:26px 22px; text-align:center; max-width:290px; width:90%; box-shadow:0 20px 60px rgba(156,39,176,.2); animation:mPop .4s cubic-bezier(.68,-.55,.27,1.55); }
+  @keyframes mPop { 0%{transform:scale(0)} 100%{transform:scale(1)} }
+  .modal .big { font-size:58px; display:block; }
+  .modal .r-title { font-size:20px; font-weight:900; margin:6px 0; }
+  .modal .r-score { font-size:32px; font-weight:900; background:linear-gradient(135deg, #ec407a, #ab47bc); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .modal .r-stars { font-size:13px; color:#999; margin:2px 0 12px; }
+  .modal .btn { margin:0 3px; }
+
+  .hint-box { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; color:#ce93d8; font-size:14px; z-index:2; pointer-events:none; }
+  .hint-box .icon { font-size:44px; }
+  .level-tag {
+    font-size:13px; font-weight:700; padding:4px 14px; border-radius:15px;
+    background:linear-gradient(135deg, #f48fb1, #ce93d8); color:#fff;
+    margin-top:4px; display:inline-block;
+    animation: lvPop .4s ease;
+  }
+  @keyframes lvPop { 0%{transform:scale(.5);opacity:0} 100%{transform:scale(1);opacity:1} }
+  .level-clear { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; z-index:15; pointer-events:none; }
+  .level-clear .big-text { font-size:36px; font-weight:900; color:#7b1fa2; text-shadow:0 2px 10px rgba(156,39,176,.3); }
+  .combo-txt { font-size:12px; color:#ab47bc; font-weight:600; min-width:50px; text-align:center; }
+
+  /* 切换按钮 */
+  .switch-tab {
+    position:fixed; bottom:100px; right:14px; z-index:50;
+    width:50px; height:50px; border-radius:50%; border:2px solid rgba(255,255,255,.3);
+    background: rgba(206,147,216,.8); color:#fff; font-size:20px; cursor:pointer;
+    backdrop-filter:blur(10px); box-shadow:0 4px 20px rgba(156,39,176,.3);
+    font-family:inherit; display:flex; align-items:center; justify-content:center;
+  }
+  .switch-tab:active { transform:scale(.9); }
+</style>
+</head>
+<body>
+<div class="bg-stars"></div>
+
+<button class="switch-tab" onclick="location.href='moko-game.html'" title="切换到冒险模式">🏠</button>
+
+<script>
+const deco = ['✨','⭐','💖','🌸','💫','🌟','🪄','🎀','💝','🧸','🍬','🍭'];
+for(let i=0;i<22;i++) {
+  const el=document.createElement('span');
+  el.className='float-el'; el.textContent=deco[i%deco.length];
+  el.style.cssText=`left:${Math.random()*90}%;top:${55+Math.random()*40}%;--dur:${4+Math.random()*7}s;--delay:${Math.random()*6}s;--sz:${9+Math.random()*13}px`;
+  document.body.appendChild(el);
+}
+</script>
+
+<div class="main">
+  <div class="title-row">
+    <span class="title-emoji">💗</span>
+    <div class="title-txt">萌可收集挑战</div>
+    <div class="title-sub" id="subtitle">收集萌可，但别点到坏萌可！</div>
+  </div>
+
+  <div class="score-bar">
+    <div class="score-item">💖 <span class="score-num" id="score">0</span></div>
+    <div class="score-item">🎯 <span class="score-num" id="target">/ 20</span></div>
+    <div class="score-item">🔥 <span class="combo-txt" id="combo"></span></div>
+    <div class="score-item"><span class="badge" id="roundBadge">第1关</span></div>
+  </div>
+
+  <div class="game-area" id="gameArea">
+    <div class="grass">🌿🌱🌼🌿🌸🌱🌼🌿🌱🌿</div>
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progressBar"></div>
+      <div class="progress-label" id="progressLabel">0 / 20</div>
+    </div>
+    <div class="timer-wrap"><div class="timer-inr" id="timerText">50</div></div>
+    <div class="hint-box" id="hintBox">
+      <div class="icon">👆</div>
+      <div>点我开始游戏</div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-start" id="btnStart" onclick="startGame()">🎮 开始游戏</button>
+  </div>
+  <div class="btn-row" style="margin-bottom:12px">
+    <button class="btn btn-lv active" onclick="setLevel('easy')">🌸 简单</button>
+    <button class="btn btn-lv" onclick="setLevel('normal')">⭐ 普通</button>
+    <button class="btn btn-lv" onclick="setLevel('hard')">🔥 困难</button>
+  </div>
+</div>
+
+<script>
+const BASE='https://leehomlove.github.io/ai-daily/';
+const IMG = Array.from({length:11},(_,i)=>BASE+'moko'+(i+1)+'.jpg');
+
+// 萌可定义
+const GOOD_MOKOS = [
+  { name:'爱心萌可', img:IMG[0], color:'#ff4081', pts:3 },
+  { name:'勇气萌可', img:IMG[1], color:'#ef6c00', pts:2 },
+  { name:'幸福萌可', img:IMG[2], color:'#f9a825', pts:2 },
+  { name:'盼盼萌可', img:IMG[3], color:'#2e7d32', pts:2 },
+  { name:'正正萌可', img:IMG[4], color:'#1565c0', pts:3 },
+  { name:'唱唱萌可', img:IMG[5], color:'#c2185b', pts:2 },
+  { name:'乐乐萌可', img:IMG[6], color:'#ff6f00', pts:3 },
+  { name:'笑笑萌可', img:IMG[7], color:'#e91e63', pts:2 },
+  { name:'甜心萌可', img:IMG[8], color:'#ad1457', pts:3 },
+  { name:'阳光萌可', img:IMG[9], color:'#ffab00', pts:2 },
+  { name:'独角萌可', img:IMG[10],color:'#4527a0', pts:6, rare:true },
+  { name:'萌可公主', img:IMG[2], color:'#8e24aa', pts:10, rare:true },
+];
+
+// 坏萌可——混淆视听
+const BAD_MOKOS = [
+  { name:'闹闹萌可', img:IMG[5], color:'#555', pts:-3 },
+  { name:'怕怕萌可', img:IMG[7], color:'#555', pts:-2 },
+  { name:'迷糊萌可', img:IMG[3], color:'#555', pts:-2 },
+];
+
+// 关卡
+const LEVELS = [
+  { nm:'第1关·初识', tgt:15, time:50, iv:1400, max:3, badRate:0,    rare:.04 },
+  { nm:'第2关·小心', tgt:22, time:50, iv:1200, max:4, badRate:.10,  rare:.05 },
+  { nm:'第3关·更多', tgt:28, time:55, iv:1050, max:5, badRate:.15,  rare:.06 },
+  { nm:'第4关·迷惑', tgt:30, time:55, iv:950,  max:5, badRate:.22,  rare:.07 },
+  { nm:'第5关·混乱', tgt:35, time:55, iv:850,  max:6, badRate:.28,  rare:.08 },
+  { nm:'第6关·急速', tgt:35, time:50, iv:700,  max:6, badRate:.30,  rare:.09 },
+  { nm:'第7关·风暴', tgt:40, time:50, iv:600,  max:7, badRate:.35,  rare:.10 },
+  { nm:'第8关·终极', tgt:45, time:55, iv:550,  max:8, badRate:.38,  rare:.12 },
+];
+
+const DIFF = {
+  easy:   {tm:1.5, im:1.3, mb:0, label:'简单' },
+  normal: {tm:1.0, im:1.0, mb:0, label:'普通' },
+  hard:   {tm:0.7, im:0.7, mb:1, label:'困难' },
+};
+
+let lv=0, diff='normal', score=0, tgtScore=0, combo=0, bestCombo=0;
+let running=false, gTimer=null, sTimer=null;
+let gDur=0, sInt=0, maxM=0, badR=0, rareR=0;
+let active=[], bestScore=0;
+
+const ga=document.getElementById('gameArea'), se=document.getElementById('score');
+const ce=document.getElementById('combo'), be=document.getElementById('target');
+const he=document.getElementById('hintBox'), tt=document.getElementById('timerText');
+const bs=document.getElementById('btnStart');
+const proBar=document.getElementById('progressBar'), proLabel=document.getElementById('progressLabel');
+const rb=document.getElementById('roundBadge'), subEl=document.getElementById('subtitle');
+
+bestScore=parseInt(localStorage.getItem('moko_collect_best')||'0');
+
+function setLevel(d){ if(running)return; diff=d; document.querySelectorAll('.btn-lv').forEach(b=>b.classList.remove('active')); event.target.classList.add('active'); }
+
+function buildLevel(){
+  const L=LEVELS[lv], D=DIFF[diff];
+  tgtScore=L.tgt; gDur=Math.round(L.time*D.tm); sInt=Math.round(L.iv*D.im);
+  maxM=L.max+D.mb; badR=L.badRate; rareR=L.rare;
+  rb.textContent=L.nm; be.textContent='/ '+tgtScore;
+  subEl.textContent='收集萌可，但别点到坏萌可！🛑';
+}
+
+function startGame(){
+  ga.querySelectorAll('.moko,.score-pop,.particle,.level-clear').forEach(e=>e.remove());
+  score=0;combo=0;bestCombo=0;active=[];lv=0;
+  buildLevel();
+  se.textContent='0';ce.textContent='';he.style.display='none';
+  tt.textContent=gDur;tt.style.color='#ec407a';
+  ga.querySelector('.timer-wrap').style.setProperty('--prog','100%');
+  proBar.style.width='0%';proLabel.textContent='0 / '+tgtScore;
+  bs.textContent='🎮 游戏中...';bs.style.opacity='0.7';
+  running=true;
+
+  gTimer=setInterval(()=>{
+    gDur--;
+    tt.textContent=gDur;
+    ga.querySelector('.timer-wrap').style.setProperty('--prog',(gDur/(LEVELS[lv].time*DIFF[diff].tm)*100)+'%');
+    if(gDur<=5) tt.style.color='#e53935';
+    if(gDur<=0) endGame(false);
+  },1000);
+
+  spawnOne();
+  sTimer=setInterval(()=>{ if(active.length<maxM) spawnOne(); },sInt);
+}
+
+function spawnOne(){
+  if(!running)return;
+  // 坏萌可概率
+  const isBad = Math.random()<badR;
+  let def;
+  if(isBad){
+    def=BAD_MOKOS[Math.floor(Math.random()*BAD_MOKOS.length)];
+  } else if(Math.random()<rareR){
+    const rare=GOOD_MOKOS.filter(d=>d.rare);
+    def=rare[Math.floor(Math.random()*rare.length)];
+  }else{
+    const norm=GOOD_MOKOS.filter(d=>!d.rare);
+    def=norm[Math.floor(Math.random()*norm.length)];
+  }
+
+  const el=document.createElement('div');el.className='moko';
+  const sz=def.rare?72:isBad?50:58;
+  el.innerHTML=`
+    <img src="${def.img}" style="width:${sz}px;height:${sz}px;border-radius:50%;object-fit:cover;border:3px solid ${isBad?'#666':def.color};box-shadow:0 4px 12px rgba(0,0,0,.15);display:block;${isBad?'filter:brightness(.7) grayscale(.6)':''}" alt="${def.name}">
+    ${def.rare?'<span style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);font-size:20px;">👑</span>':''}
+    <span class="moko-name" style="color:${isBad?'#999':def.color};font-weight:900;font-size:11px;">${def.name}</span>
+  `;
+
+  const aw=ga.clientWidth, ah=ga.clientHeight;
+  el.style.left=(20+Math.random()*(aw-80))+'px';
+  el.style.top=(20+Math.random()*(ah-150))+'px';
+  if(def.rare||isBad) el.style.zIndex='6';
+
+  el.addEventListener('pointerdown',(e)=>{ e.preventDefault(); tap(el,def.pts,def.color,isBad); });
+  ga.appendChild(el);active.push(el);
+
+  const life=def.rare?3500:(isBad?1800:2200+Math.random()*1200);
+  setTimeout(()=>{
+    if(el.parentNode&&running){
+      el.classList.add(isBad?'bad':'popping');
+      setTimeout(()=>{el.remove();active=active.filter(m=>m!==el);},300);
+      if(!isBad){combo=0;ce.textContent='';}
+    }
+  },life);
+}
+
+function tap(el,pts,color,isBad){
+  if(!running||el.classList.contains('popping')||el.classList.contains('bad'))return;
+
+  if(isBad){
+    // 坏萌可惩罚
+    el.classList.add('bad');
+    score=Math.max(0, score+pts); // pts 是负数
+    combo=0; ce.textContent='坏了！-3 💔'; ce.style.color='#e53935';
+    setTimeout(()=>{ce.textContent='';ce.style.color='#ab47bc';},1000);
+    se.textContent=score;
+    proBar.style.width=Math.min(100,Math.round(score/tgtScore*100))+'%';
+    proLabel.textContent=score+' / '+tgtScore;
+    if(navigator.vibrate) navigator.vibrate(30);
+
+    const pop=document.createElement('div');pop.className='score-pop';
+    pop.textContent=pts;pop.style.left=el.style.left;pop.style.top=el.style.top;pop.style.color='#e53935';
+    ga.appendChild(pop);setTimeout(()=>pop.remove(),700);
+
+    setTimeout(()=>{el.remove();active=active.filter(m=>m!==el);},300);
+    return;
+  }
+
+  el.classList.add('popping');
+
+  combo++; if(combo>bestCombo) bestCombo=combo;
+  const bonus=Math.min(combo-1,8);
+  const earned=pts+bonus;
+  score+=earned; se.textContent=score;
+  const pct=Math.min(100,Math.round(score/tgtScore*100));
+  proBar.style.width=pct+'%';proLabel.textContent=score+' / '+tgtScore;
+
+  if(combo>=3){ ce.textContent=combo+'连击!🎉'; ce.style.transform='scale(1.2)'; setTimeout(()=>ce.style.transform='scale(1)',150); }
+  if(combo>=6){ ce.textContent='🔥'+combo+'连击!太厉害了!'; ce.style.color='#e53935'; }
+
+  const pop=document.createElement('div');pop.className='score-pop';
+  pop.textContent='+'+earned;pop.style.left=el.style.left;pop.style.top=el.style.top;pop.style.color=color;
+  if(earned>=8) pop.style.fontSize='26px';
+  ga.appendChild(pop);setTimeout(()=>pop.remove(),700);
+
+  const ptsArr=['✨','💫','🌟','⭐','💖','🎀','🌸','💝'];
+  for(let i=0;i<8;i++){const p=document.createElement('div');p.className='particle';p.textContent=ptsArr[i];p.style.left=el.style.left;p.style.top=el.style.top;p.style.setProperty('--dx',(Math.random()*70-35)+'px');p.style.setProperty('--dy',(Math.random()*-70-15)+'px');ga.appendChild(p);setTimeout(()=>p.remove(),500);}
+
+  if(navigator.vibrate) navigator.vibrate(earned>=5?15:8);
+
+  setTimeout(()=>{el.remove();active=active.filter(m=>m!==el);},300);
+
+  if(score>=tgtScore){
+    if(lv<LEVELS.length-1){ goNext(); }else{ endGame(true); }
+  }
+}
+
+function goNext(){
+  running=false;clearInterval(sTimer);sTimer=null;
+  ga.querySelectorAll('.moko').forEach(e=>{e.classList.add('popping');setTimeout(()=>e.remove(),300);});
+  active=[];
+  const cd=document.createElement('div');cd.className='level-clear';
+  cd.innerHTML=`<div class="big-text">🎉 第${lv+1}关通过！</div><div style="color:#ab47bc;margin-top:4px;">准备下一关…</div>`;
+  ga.appendChild(cd);
+
+  setTimeout(()=>{
+    cd.remove();lv++;buildLevel();gDur=Math.round(LEVELS[lv].time*DIFF[diff].tm);
+    tt.textContent=gDur;tt.style.color='#ec407a';
+    ga.querySelector('.timer-wrap').style.setProperty('--prog','100%');
+    sInt=Math.round(LEVELS[lv].iv*DIFF[diff].im);maxM=LEVELS[lv].max+DIFF[diff].mb;
+    proBar.style.width='0%';proLabel.textContent='0 / '+tgtScore;
+    combo=0;ce.textContent='';
+    running=true;
+    spawnOne();
+    sTimer=setInterval(()=>{if(active.length<maxM)spawnOne();},sInt);
+  },1500);
+}
+
+function endGame(allClear){
+  running=false;clearInterval(gTimer);clearInterval(sTimer);gTimer=null;sTimer=null;
+  ga.querySelectorAll('.moko').forEach(e=>{e.classList.add('popping');setTimeout(()=>e.remove(),300);});
+  active=[];bs.textContent='🔄 再来一次';bs.style.opacity='1';tt.style.color='#ec407a';
+  if(score>bestScore){bestScore=score;localStorage.setItem('moko_collect_best',bestScore);}
+  showResult(allClear);
+}
+
+function showResult(allClear){
+  const cleared=allClear?lv+1:lv;
+  const total=LEVELS.length;
+  let stars=score>=150?'🌟🌟🌟🌟':score>=100?'🌟🌟🌟':score>=60?'🌟🌟':score>=30?'🌟':'💪';
+  let title=allClear?'🎊 全部通关！萌可大师！🏆':cleared>=6?'超级厉害！🔥':cleared>=4?'太厉害了！🎉':cleared>=2?'好棒！继续加油！😊':cleared>=1?'不错哦！💪':'再来一次吧！🌸';
+
+  const overlay=document.createElement('div');overlay.className='modal-overlay';
+  overlay.innerHTML='<div class="modal"><span class="big">'+(allClear?'👑':score>=80?'🦄':score>=40?'💗':'🌸')+'</span><div class="r-title">'+title+'</div><div class="r-score">'+score+'</div><div class="r-stars">'+stars+' &nbsp; 通过 '+cleared+'/'+total+' 关 &nbsp; 最高连击 '+bestCombo+'次</div><div><button class="btn btn-start" onclick="this.closest(\'.modal-overlay\').remove();startGame();">🔄 重新开始</button><button class="btn btn-start" style="background:linear-gradient(135deg,#7c4dff,#ce93d8);margin-left:6px;" onclick="location.href=\'moko-game.html\'">🏠 冒险模式</button></div></div>';
+  overlay.addEventListener('click',(e)=>{if(e.target===overlay)overlay.remove();});
+  document.body.appendChild(overlay);
+}
+
+ga.addEventListener('pointerdown',(e)=>{if(e.target===ga&&!running)startGame();});
+buildLevel();
+</script>
+</body>
+</html>
