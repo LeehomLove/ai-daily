@@ -13,150 +13,111 @@
   body {
     font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
     background: linear-gradient(180deg, #0a0a2e, #1a1040, #2d1b69, #1a1040);
-    min-height: 100vh; color: #fff; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+    min-height:100vh; color:#fff; touch-action:manipulation; -webkit-tap-highlight-color:transparent;
   }
   body::before {
     content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
     background: radial-gradient(ellipse at 50% 20%, rgba(120,100,255,.15), transparent 60%),
-      radial-gradient(2px 2px at 10% 20%, #fff, transparent), radial-gradient(2px 2px at 25% 45%, #fff, transparent),
-      radial-gradient(2px 2px at 55% 35%, #fff, transparent), radial-gradient(3px 3px at 20% 75%, rgba(255,215,0,.6), transparent),
-      radial-gradient(2px 2px at 75% 70%, rgba(255,255,255,.7), transparent);
+      radial-gradient(2px 2px at 10% 20%,#fff,transparent),radial-gradient(2px 2px at 25% 45%,#fff,transparent),
+      radial-gradient(2px 2px at 55% 35%,#fff,transparent),radial-gradient(3px 3px at 20% 75%,rgba(255,215,0,.6),transparent);
   }
-  .main { position:relative; z-index:1; display:flex; flex-direction:column; height:100vh; max-width:520px; margin:0 auto; }
+  .main { position:relative;z-index:1;display:flex;flex-direction:column;height:100vh;max-width:520px;margin:0 auto; }
   .topbar {
-    display:flex; align-items:center; justify-content:space-between; padding:8px 14px;
-    background:rgba(0,0,0,.4); backdrop-filter:blur(15px); -webkit-backdrop-filter:blur(15px);
-    border-bottom:1px solid rgba(255,255,255,.06); flex-shrink:0;
+    display:flex;align-items:center;justify-content:space-between;padding:8px 14px;
+    background:rgba(0,0,0,.4);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);
+    border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;
   }
-  .topbar .moko-info { display:flex; align-items:center; gap:8px; }
-  .topbar img { width:32px; height:32px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,255,255,.2); }
-  .topbar .name { font-size:14px; font-weight:700; }
-  .topbar .world { font-size:10px; color:rgba(255,255,255,.4); }
-  .topbar .right { display:flex; align-items:center; gap:8px; }
-  .speaker-btn {
-    width:32px;height:32px;border-radius:50%;border:none;background:rgba(255,255,255,.1);
-    color:#fff;font-size:14px;cursor:pointer;font-family:inherit;flex-shrink:0;
-  }
-  .speaker-btn:active { background:rgba(255,255,255,.2); }
-  .star-badge { font-size:13px;font-weight:700; background:rgba(255,255,255,.1); padding:3px 10px; border-radius:12px; }
+  .topbar .mi{display:flex;align-items:center;gap:8px;}
+  .topbar img{width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.2);}
+  .topbar .n{font-size:14px;font-weight:700;}
+  .topbar .w{font-size:10px;color:rgba(255,255,255,.4);}
+  .topbar .r{display:flex;align-items:center;gap:8px;}
+  .spk-btn{width:32px;height:32px;border-radius:50%;border:none;background:rgba(255,255,255,.1);color:#fff;font-size:14px;cursor:pointer;font-family:inherit;flex-shrink:0;}
+  .spk-btn:active{background:rgba(255,255,255,.2);}
+  .star-b{font-size:13px;font-weight:700;background:rgba(255,255,255,.1);padding:3px 10px;border-radius:12px;}
 
-  .chat {
-    flex:1; overflow-y:auto; padding:12px 14px; display:flex; flex-direction:column; gap:12px;
-    -webkit-overflow-scrolling:touch;
-  }
-  .chat::-webkit-scrollbar { display:none; }
+  .chat{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:12px;-webkit-overflow-scrolling:touch;}
+  .chat::-webkit-scrollbar{display:none;}
+  .msg{display:flex;gap:8px;max-width:88%;animation:fadeUp .25s ease;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .msg.m{ align-self:flex-start; }
+  .msg.y{ align-self:flex-end; flex-direction:row-reverse; }
+  .msg .av{width:36px;height:36px;border-radius:50%;flex-shrink:0;object-fit:cover;border:2px solid rgba(255,255,255,.2);}
+  .msg .bb{background:rgba(255,255,255,.08);border-radius:18px;padding:10px 14px;font-size:15px;line-height:1.55;border:1px solid rgba(255,255,255,.05);word-break:break-word;}
+  .msg.y .bb{background:rgba(120,100,255,.25);}
+  .msg.m .bb{border-radius:18px 18px 18px 4px;}
+  .msg.y .bb{border-radius:18px 18px 4px 18px;}
+  .typing-cursor{display:inline-block;width:2px;height:16px;background:#fff;margin-left:2px;animation:blink .6s infinite;vertical-align:middle;}
+  @keyframes blink{0%,100%{opacity:.5}50%{opacity:1}}
 
-  .msg { display:flex; gap:8px; max-width:88%; animation:fadeUp .25s ease; }
-  @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-  .msg.moko { align-self:flex-start; }
-  .msg.you { align-self:flex-end; flex-direction:row-reverse; }
-  .msg .avatar {
-    width:36px;height:36px;border-radius:50%;flex-shrink:0;object-fit:cover;
-    border:2px solid rgba(255,255,255,.2);
-  }
-  .msg .bubble {
-    background:rgba(255,255,255,.08); border-radius:18px; padding:10px 14px; font-size:15px;
-    line-height:1.55; border:1px solid rgba(255,255,255,.05); word-break:break-word;
-  }
-  .msg.you .bubble { background:rgba(120,100,255,.25); }
-  .msg.moko .bubble { border-radius:18px 18px 18px 4px; }
-  .msg.you .bubble { border-radius:18px 18px 4px 18px; }
+  .choices{display:flex;flex-wrap:wrap;gap:8px;padding:4px 14px 8px;}
+  .ch-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:10px 18px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;flex:1;min-width:90px;text-align:center;-webkit-tap-highlight-color:transparent;}
+  .ch-btn:active{background:rgba(120,100,255,.35);transform:scale(.96);}
 
-  .typing-cursor { display:inline-block; width:2px; height:16px; background:#fff; margin-left:2px; animation:blink .6s infinite; vertical-align:middle; }
-  @keyframes blink { 0%,100%{opacity:.5} 50%{opacity:1} }
-
-  .choices { display:flex; flex-wrap:wrap; gap:8px; padding:4px 14px 8px; }
-  .choice-btn {
-    background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.1);
-    border-radius:20px; padding:10px 18px; color:#fff; font-size:14px; font-weight:600;
-    cursor:pointer; font-family:inherit; transition:all .15s; flex:1; min-width:90px; text-align:center;
-    -webkit-tap-highlight-color:transparent;
-  }
-  .choice-btn:active { background:rgba(120,100,255,.35); transform:scale(.96); }
-
-  .input-area {
-    padding:6px 14px var(--safe-bottom) 14px; background:rgba(0,0,0,.5);
-    backdrop-filter:blur(15px); -webkit-backdrop-filter:blur(15px);
-    border-top:1px solid rgba(255,255,255,.06); flex-shrink:0;
-  }
-  .input-row { display:flex; gap:8px; align-items:center; }
-  .voice-btn {
+  .input-area{padding:6px 14px var(--safe-bottom) 14px;background:rgba(0,0,0,.5);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);border-top:1px solid rgba(255,255,255,.06);flex-shrink:0;}
+  .input-row{display:flex;gap:8px;align-items:center;}
+  .voice-btn{
     width:50px;height:50px;border-radius:50%;border:none;
-    background:linear-gradient(135deg, #ff4081, #7c4dff); color:#fff; font-size:22px;
-    cursor:pointer; flex-shrink:0; box-shadow:0 4px 20px rgba(255,64,129,.25);
-    transition:all .15s; display:flex; align-items:center; justify-content:center; font-family:inherit;
-    -webkit-tap-highlight-color:transparent;
+    background:linear-gradient(135deg,#ff4081,#7c4dff);color:#fff;font-size:22px;
+    cursor:pointer;flex-shrink:0;box-shadow:0 4px 20px rgba(255,64,129,.25);
+    display:flex;align-items:center;justify-content:center;font-family:inherit;
+    -webkit-tap-highlight-color:transparent;transition:all .15s;
   }
-  .voice-btn:active { transform:scale(.88); }
-  .voice-btn.rec { background:linear-gradient(135deg, #ff1744, #d50000); animation:ringPulse .7s infinite; }
-  @keyframes ringPulse { 0%,100%{box-shadow:0 0 20px rgba(255,23,68,.3)} 50%{box-shadow:0 0 40px rgba(255,23,68,.7)} }
-  .text-input {
-    flex:1; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.06);
-    border-radius:25px; padding:13px 18px; color:#fff; font-size:16px; font-family:inherit; outline:none;
-    min-width:0; -webkit-appearance:none;
-  }
-  .text-input::placeholder { color:rgba(255,255,255,.3); }
-  .send-btn {
-    width:50px;height:50px;border-radius:50%;border:none;background:rgba(255,255,255,.1);
-    color:#fff;font-size:20px;cursor:pointer;flex-shrink:0;font-family:inherit;
-  }
-  .send-btn:active { background:rgba(255,255,255,.2); }
+  .voice-btn:active{transform:scale(.88);}
+  .voice-btn.rec{background:linear-gradient(135deg,#ff1744,#d50000);animation:ringPulse .7s infinite;}
+  @keyframes ringPulse{0%,100%{box-shadow:0 0 20px rgba(255,23,68,.3)}50%{box-shadow:0 0 40px rgba(255,23,68,.7)}}
+  .text-input{flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.06);border-radius:25px;padding:13px 18px;color:#fff;font-size:16px;font-family:inherit;outline:none;min-width:0;-webkit-appearance:none;}
+  .text-input::placeholder{color:rgba(255,255,255,.3);}
+  .send-btn{width:50px;height:50px;border-radius:50%;border:none;background:rgba(255,255,255,.1);color:#fff;font-size:20px;cursor:pointer;flex-shrink:0;font-family:inherit;}
+  .send-btn:active{background:rgba(255,255,255,.2);}
 
-  .moko-pick {
-    position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.9);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 16px;
-  }
-  .moko-pick h2 { font-size:22px; margin-bottom:4px; }
-  .moko-pick .sub { font-size:13px; color:rgba(255,255,255,.4); margin-bottom:20px; }
-  .moko-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; max-width:360px; width:100%; }
-  .moko-card {
-    background:rgba(255,255,255,.06); border-radius:18px; padding:14px 6px; text-align:center;
-    cursor:pointer; border:2px solid transparent; transition:all .15s;
-    -webkit-tap-highlight-color:transparent;
-  }
-  .moko-card:active { background:rgba(120,100,255,.15); border-color:rgba(120,100,255,.3); transform:scale(.95); }
-  .moko-card img { width:56px;height:56px;border-radius:50%;object-fit:cover;margin-bottom:6px;border:2px solid rgba(255,255,255,.2); }
-  .moko-card .n { font-size:12px;font-weight:700; }
+  .moko-pick{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 16px;}
+  .moko-pick h2{font-size:22px;margin-bottom:4px;}
+  .moko-pick .sub{font-size:13px;color:rgba(255,255,255,.4);margin-bottom:20px;}
+  .moko-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;max-width:360px;width:100%;}
+  .moko-card{background:rgba(255,255,255,.06);border-radius:18px;padding:14px 6px;text-align:center;cursor:pointer;border:2px solid transparent;transition:all .15s;-webkit-tap-highlight-color:transparent;}
+  .moko-card:active{background:rgba(120,100,255,.15);border-color:rgba(120,100,255,.3);transform:scale(.95);}
+  .moko-card img{width:56px;height:56px;border-radius:50%;object-fit:cover;margin-bottom:6px;border:2px solid rgba(255,255,255,.2);}
+  .moko-card .nc{font-size:12px;font-weight:700;}
 
-  .intro {
-    position:fixed;inset:0;z-index:60;background:radial-gradient(ellipse at center, #1a1040, #0a0a2e);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    animation:fadeAway .5s ease 2s forwards;
-  }
-  @keyframes fadeAway { to { opacity:0; pointer-events:none; } }
-  .intro .t { font-size:30px;font-weight:900;text-align:center;animation:pop .7s ease; }
-  @keyframes pop { from{transform:scale(.5);opacity:0} to{transform:scale(1);opacity:1} }
-  .intro .s { font-size:15px;color:rgba(255,255,255,.5);margin-top:6px; }
+  .intro{position:fixed;inset:0;z-index:60;background:radial-gradient(ellipse at center,#1a1040,#0a0a2e);display:flex;flex-direction:column;align-items:center;justify-content:center;animation:fadeAway .5s ease 2s forwards;}
+  @keyframes fadeAway{to{opacity:0;pointer-events:none;}}
+  .intro .t{font-size:30px;font-weight:900;text-align:center;animation:pop .7s ease;}
+  @keyframes pop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+  .intro .s{font-size:15px;color:rgba(255,255,255,.5);margin-top:6px;}
 
-  .world-trans {
-    position:fixed;inset:0;z-index:40;background:#0a0a2e;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    animation:wt 2s ease forwards;
-  }
-  @keyframes wt { 0%{opacity:0} 20%{opacity:1} 80%{opacity:1} 100%{opacity:0;pointer-events:none} }
-  .world-trans .ic { font-size:56px;animation:bounce .5s ease infinite; }
-  .world-trans .nm { font-size:22px;font-weight:900;margin-top:8px; }
+  .world-trans{position:fixed;inset:0;z-index:40;background:#0a0a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;animation:wt 2s ease forwards;}
+  @keyframes wt{0%{opacity:0}20%{opacity:1}80%{opacity:1}100%{opacity:0;pointer-events:none}}
+  .world-trans .ic{font-size:56px;animation:bounce .5s ease infinite;}
+  .world-trans .nm{font-size:22px;font-weight:900;margin-top:8px;}
 
-  .loading-dots { display:inline-flex; gap:4px; }
-  .loading-dots span { width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.4);animation:dotBounce 1.3s infinite; }
-  .loading-dots span:nth-child(2) { animation-delay:.2s; }
-  .loading-dots span:nth-child(3) { animation-delay:.4s; }
-  @keyframes dotBounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-7px)} }
+  .loading-dots{display:inline-flex;gap:4px;}
+  .loading-dots span{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.4);animation:dotBounce 1.3s infinite;}
+  .loading-dots span:nth-child(2){animation-delay:.2s;}
+  .loading-dots span:nth-child(3){animation-delay:.4s;}
+  @keyframes dotBounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-7px)}}
 
-  .speak-ind {
-    position:fixed;bottom:130px;left:50%;transform:translateX(-50%);z-index:30;
-    background:rgba(0,0,0,.7);color:#fff;border-radius:20px;padding:7px 14px;font-size:12px;
-    display:none;align-items:center;gap:6px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  .speak-ind{position:fixed;bottom:130px;left:50%;transform:translateX(-50%);z-index:30;background:rgba(0,0,0,.7);color:#fff;border-radius:20px;padding:7px 14px;font-size:12px;display:none;align-items:center;gap:6px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
+  .speak-ind.on{display:flex;}
+  .speak-ind .wave{display:flex;gap:2px;align-items:flex-end;}
+  .speak-ind .wave span{width:3px;border-radius:2px;animation:wa .4s ease infinite alternate;}
+  .speak-ind .wave span:nth-child(1){height:8px;background:#ff4081;}
+  .speak-ind .wave span:nth-child(2){height:14px;background:#ce93d8;animation-delay:.1s;}
+  .speak-ind .wave span:nth-child(3){height:10px;background:#7c4dff;animation-delay:.2s;}
+  .speak-ind .wave span:nth-child(4){height:16px;background:#f48fb1;animation-delay:.3s;}
+  .speak-ind .wave span:nth-child(5){height:9px;background:#ce93d8;animation-delay:.4s;}
+  @keyframes wa{to{transform:scaleY(.3);}}
+
+  /* 语音状态弹窗 */
+  .voice-status{
+    position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:200;
+    background:rgba(0,0,0,.85);color:#fff;border-radius:24px;padding:24px 32px;
+    text-align:center;font-size:16px;display:none;flex-direction:column;align-items:center;gap:12px;
+    min-width:200px;
   }
-  .speak-ind.on { display:flex; }
-  .speak-ind .wave { display:flex; gap:2px; align-items:flex-end; }
-  .speak-ind .wave span { width:3px; border-radius:2px; animation:wa .4s ease infinite alternate; }
-  .speak-ind .wave span:nth-child(1){ height:8px; background:#ff4081; }
-  .speak-ind .wave span:nth-child(2){ height:14px; background:#ce93d8; animation-delay:.1s; }
-  .speak-ind .wave span:nth-child(3){ height:10px; background:#7c4dff; animation-delay:.2s; }
-  .speak-ind .wave span:nth-child(4){ height:16px; background:#f48fb1; animation-delay:.3s; }
-  .speak-ind .wave span:nth-child(5){ height:9px; background:#ce93d8; animation-delay:.4s; }
-  @keyframes wa { to { transform:scaleY(.3); } }
+  .voice-status.show{display:flex;}
+  .voice-status .mic-icon{font-size:48px;}
+  .voice-status .mic-text{font-size:14px;color:rgba(255,255,255,.6);}
 </style>
 </head>
 <body>
@@ -168,33 +129,27 @@
   💬 萌可说话中...
 </div>
 
+<div class="voice-status" id="voiceStatus">
+  <div class="mic-icon">🎤</div>
+  <div id="voiceStatusText">正在听…</div>
+  <div class="mic-text" id="voiceResult"></div>
+</div>
+
 <div class="main">
   <div class="topbar">
-    <div class="moko-info">
-      <img id="mokoAv" src="https://leehomlove.github.io/ai-daily/moko1.jpg" alt="">
-      <div>
-        <div class="world" id="worldNm">🌈 彩虹森林</div>
-        <div class="name" id="mokoNm">和萌可一起冒险</div>
-      </div>
-    </div>
-    <div class="right">
-      <button class="speaker-btn" id="speakerBtn" onclick="toggleSpeech()" title="萌可声音">🔊</button>
-      <div class="star-badge">⭐ <span id="starN">0</span></div>
-    </div>
+    <div class="mi"><img id="mokoAv" src="https://leehomlove.github.io/ai-daily/moko1.jpg" alt=""><div><div class="w" id="worldNm">🌈 彩虹森林</div><div class="n" id="mokoNm">和萌可一起冒险</div></div></div>
+    <div class="r"><button class="spk-btn" id="speakerBtn" onclick="toggleSpeech()" title="萌可声音">🔊</button><div class="star-b">⭐ <span id="starN">0</span></div></div>
   </div>
 
   <div class="chat" id="chat">
-    <div class="msg moko">
-      <img class="avatar" src="https://leehomlove.github.io/ai-daily/moko1.jpg" alt="">
-      <div class="bubble">选一个萌可伙伴<br>开始魔法冒险吧！✨</div>
-    </div>
+    <div class="msg m"><img class="av" src="https://leehomlove.github.io/ai-daily/moko1.jpg" alt=""><div class="bb">选一个萌可伙伴<br>开始魔法冒险吧！✨</div></div>
   </div>
 
   <div class="choices" id="choices"></div>
 
   <div class="input-area">
     <div class="input-row">
-      <button class="voice-btn" id="voiceBtn" title="按住说话">🎤</button>
+      <button class="voice-btn" id="voiceBtn" title="点击开始说话">🎤</button>
       <input class="text-input" id="textInp" type="text" placeholder="输入想说的话…" maxlength="200" autocomplete="off">
       <button class="send-btn" id="sendBtn" onclick="sendText()">📤</button>
     </div>
@@ -208,20 +163,20 @@
 </div>
 
 <script>
-const DEEPSEEK_KEY='sk-f369a602e9be4452b179433a12fc96e4', BASE='https://leehomlove.github.io/ai-daily/';
+const DK='sk-f369a602e9be4452b179433a12fc96e4', BASE='https://leehomlove.github.io/ai-daily/';
 
 const MOKOS=[{id:'heart',name:'爱心萌可',img:BASE+'moko1.jpg',e:'💗',
-  p:'你是爱心萌可💗，爱和温暖的化身。你说话温柔可爱，总说"啾~"开头。用💗结尾。你的一切魔法来自爱。'},
+  p:'你是爱心萌可💗。用纯中文回复，你只说中文。你温柔可爱，喜欢说"啾~"。你的魔法来自爱。用💗结尾。'},
   {id:'courage',name:'勇气萌可',img:BASE+'moko2.jpg',e:'🧡',
-   p:'你是勇气萌可🧡，充满力量！说话爽朗勇敢，喜欢说"哈哈！"。你永远保护朋友。用⚡结尾。'},
+   p:'你是勇气萌可🧡。用纯中文回复，你只说中文。你爽朗勇敢，喜欢说"哈哈！"。保护朋友。用⚡结尾。'},
   {id:'happy',name:'幸福萌可',img:BASE+'moko3.jpg',e:'💛',
-   p:'你是幸福萌可💛，快乐的化身！总是元气满满。把快乐传染给每个朋友。用☀️结尾。'},
+   p:'你是幸福萌可💛。用纯中文回复，你只说中文。总是元气满满。把快乐传递给朋友。用☀️结尾。'},
   {id:'sing',name:'唱唱萌可',img:BASE+'moko5.jpg',e:'🎵',
-   p:'你是唱唱萌可🎵，爱唱歌的小可爱！说话像唱歌。用歌声让花儿盛开。用🎶结尾。'},
+   p:'你是唱唱萌可🎵。用纯中文回复，你只说中文。爱唱歌的小可爱，说话像唱歌。用🎶结尾。'},
   {id:'hope',name:'盼盼萌可',img:BASE+'moko6.jpg',e:'💚',
-   p:'你是盼盼萌可💚，希望的化身。安静温柔。总是看到美好。给朋友希望。用🍀结尾。'},
+   p:'你是盼盼萌可💚。用纯中文回复，你只说中文。安静温柔，总看到美好。用🍀结尾。'},
   {id:'wise',name:'正正萌可',img:BASE+'moko4.jpg',e:'💙',
-   p:'你是正正萌可💙，聪明的萌可！善于思考。给朋友好建议。你的魔法来自知识。用📖结尾。'}];
+   p:'你是正正萌可💙。用纯中文回复，你只说中文。聪明的萌可，善于思考。用📖结尾。'}];
 
 const WORLDS=[{id:'forest',nm:'🌈 彩虹森林',ic:'🌈',
   intro:'欢迎来到彩虹森林！发光的蘑菇会说话，彩虹瀑布会唱歌🌈\n\n萌可和你的冒险开始啦！',
@@ -244,7 +199,8 @@ let chs=[];
 const ca=document.getElementById('chat'),cd=document.getElementById('choices');
 const vb=document.getElementById('voiceBtn'),tx=document.getElementById('textInp');
 const pk=document.getElementById('mokoPick'),sb=document.getElementById('speakerBtn');
-const spI=document.getElementById('speakInd');
+const spI=document.getElementById('speakInd'),vs=document.getElementById('voiceStatus');
+const vsText=document.getElementById('voiceStatusText'),vsRes=document.getElementById('voiceResult');
 
 // ===== 语音朗读 =====
 function speak(t){
@@ -263,144 +219,143 @@ function procQ(){
   if(v)u.voice=v;
   const sents=tx.split(/(?<=[。！？，])/).filter(s=>s.trim());
   if(sents.length>1&&sents.length<=5){
-    let i=0; function ns(){if(i>=sents.length){procQ();return;} const s=sents[i].trim();i++;if(s.length<2){ns();return;} const su=new SpeechSynthesisUtterance(s);su.lang=u.lang;su.rate=u.rate;su.pitch=u.pitch;su.volume=u.volume;if(v)su.voice=v;su.onend=()=>setTimeout(ns,60);su.onerror=ns;speechSynthesis.speak(su);} ns();
-  }else{ u.onend=u.onerror=procQ; speechSynthesis.speak(u); }
+    let i=0;function ns(){if(i>=sents.length){procQ();return;}const s=sents[i].trim();i++;if(s.length<2){ns();return;}const su=new SpeechSynthesisUtterance(s);su.lang=u.lang;su.rate=u.rate;su.pitch=u.pitch;su.volume=u.volume;if(v)su.voice=v;su.onend=()=>setTimeout(ns,60);su.onerror=ns;speechSynthesis.speak(su);}ns();
+  }else{u.onend=u.onerror=procQ;speechSynthesis.speak(u);}
 }
-function toggleSpeech(){spActive=!spActive;if(!spActive){speechSynthesis.cancel();spQ=[];spk=false;spI.classList.remove('on');} sb.textContent=spActive?'🔊':'🔇';}
+function toggleSpeech(){spActive=!spActive;if(!spActive){speechSynthesis.cancel();spQ=[];spk=false;spI.classList.remove('on');}sb.textContent=spActive?'🔊':'🔇';}
 
-// ===== Speech Recognition for iOS Safari =====
+// ===== 语音输入（iOS Safari 兼容版）=====
 let rec=null,recording=false;
 function initRec(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){vb.style.opacity='0.3';vb.title='语音不可用';return;}
+  if(!SR){vb.style.opacity='0.3';vb.title='语音不可用（请升级 iOS）';return;}
 
   rec=new SR();
-  rec.lang='zh-CN'; rec.continuous=false; rec.interimResults=true;
+  rec.lang='zh-CN';
+  rec.continuous=false;
+  rec.interimResults=true;
+
   rec.onresult=(ev)=>{
     let ft='',it='';
-    for(let i=0;i<ev.results.length;i++){ const r=ev.results[i]; if(r.isFinal)ft+=r[0].transcript; else it+=r[0].transcript; }
-    const tx=(ft||it).trim();
-    if(tx&&tx.length>1){
-      document.getElementById('textInp').value=tx;
-      // 重要：iOS 上必须在 onresult 完成后再调用 sendText
-      stopRec();
-      setTimeout(()=>sendText(), 200);
-    } else {
-      stopRec();
-    }
-  };
-  rec.onerror=(e)=>{
-    console.warn('语音错误:',e.error);
-    // iOS 上常见的几个可以忽略的错误
-    if(e.error==='no-speech'||e.error==='aborted'){
-      stopRec();
-    } else {
-      stopRec();
-    }
-  };
-  rec.onend=stopRec;
-  rec.onaudiostart=()=>console.log('🎙 正在听…');
-  rec.onspeechstart=()=>console.log('🗣 检测到说话…');
-}
+    for(let i=0;i<ev.results.length;i++){const r=ev.results[i];if(r.isFinal)ft+=r[0].transcript;else it+=r[0].transcript;}
+    const result=(ft||it).trim();
 
-function tryMicPermission(){
-  // iOS Safari 需要用户交互后才能获取麦克风权限
-  if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
-    navigator.mediaDevices.getUserMedia({audio:true}).then((stream)=>{
-      console.log('✅ 麦克风权限已获取');
-      stream.getTracks().forEach(t=>t.stop()); // 立即释放
-      vb.style.opacity='1';
-      vb.title='按住说话';
-    }).catch(()=>{
-      console.log('⚠️ 麦克风权限被拒绝');
-      vb.style.opacity='0.5';
-    });
-  }
+    // 实时更新状态弹窗
+    if(result){
+      vsRes.textContent=result;
+      vsText.textContent=ft?'听到了！':'正在识别…';
+    }
+
+    if(result&&result.length>1){
+      tx.value=result;
+      // 关闭录音 UI
+      stopRec();
+      // 发送
+      setTimeout(()=>{
+        vs.classList.remove('show');
+        sendText();
+      },500);
+    }
+  };
+
+  rec.onerror=(e)=>{
+    console.warn('语音:',e.error);
+    vsText.textContent=e.error==='no-speech'?'没听到声音，请再说一次':'语音失败了，请重试';
+    setTimeout(()=>{vs.classList.remove('show');stopRec();},1200);
+  };
+
+  rec.onend=()=>{
+    recording=false;vb.classList.remove('rec');vb.textContent='🎤';
+  };
+
+  rec.onspeechstart=()=>{
+    vsText.textContent='正在听…';
+    vsRes.textContent='';
+  };
+
+  console.log('✅ 语音就绪 (iOS Safari)');
 }
 
 function startRec(){
   if(!rec)return;
-  // iOS Safari 每次 start 前不能有未结束的实例
+  // 显示状态弹窗
+  vs.classList.add('show');
+  vsText.textContent='正在听…';
+  vsRes.textContent='';
+
+  // 先终止旧实例
   try{rec.abort();}catch(e){}
+
   setTimeout(()=>{
     try{
-      recording=true; vb.classList.add('rec'); vb.textContent='🔴';
+      recording=true;
+      vb.classList.add('rec');
+      vb.textContent='🔴';
       rec.start();
     }catch(e){
-      console.log('rec.start error:',e);
-      // 可能因为权限未获取，尝试请求权限后重试
-      if(e.message&&e.message.includes('not-allowed')){
-        tryMicPermission();
-      }
+      console.log('start error:',e);
+      vsText.textContent='请允许使用麦克风';
+      vsRes.textContent='打开设置 > Safari > 麦克风';
+      setTimeout(()=>vs.classList.remove('show'),2000);
       stopRec();
     }
   },100);
 }
 
 function stopRec(){
-  if(!recording)return;
-  recording=false; vb.classList.remove('rec'); vb.textContent='🎤';
   try{rec.stop();}catch(e){}
+  recording=false;
+  vb.classList.remove('rec');
+  vb.textContent='🎤';
 }
 
-// iOS: 第一次点击按钮时请求麦克风权限
-vb.addEventListener('pointerdown',(e)=>{
+// === 点击事件 ===
+// 单击 = 开始录音，再单击 = 停止
+vb.addEventListener('click',(e)=>{
   e.preventDefault();
-  if(!rec) return;
-  // 第一次交互时尝试激活麦克风
-  tryMicPermission();
-  startRec();
-});
-vb.addEventListener('pointerup',(e)=>{
-  e.preventDefault();
-  stopRec();
-});
-vb.addEventListener('pointerleave',stopRec);
-
-// 兼容旧 iOS 的 touch 事件
-vb.addEventListener('touchstart',(e)=>{
-  // 不需要 preventDefault，让 pointer 事件处理
-  if(!window.PointerEvent){
-    e.preventDefault();
-    tryMicPermission();
+  if(recording){
+    // 正在录 → 停止
+    stopRec();
+    vs.classList.remove('show');
+    // 如果 input 里有文字就发送
+    if(tx.value.trim()){
+      setTimeout(()=>sendText(),100);
+    }
+  } else {
+    // 没在录 → 开始
     startRec();
   }
-},{passive:true});
-vb.addEventListener('touchend',(e)=>{
-  if(!window.PointerEvent){
-    e.preventDefault();
-    stopRec();
-  }
-},{passive:true});
-vb.addEventListener('touchcancel',stopRec);
+});
+
+// 长按也支持
+vb.addEventListener('pointerdown',(e)=>{e.preventDefault(); if(!recording)startRec();});
+vb.addEventListener('pointerup',(e)=>{e.preventDefault(); if(recording){stopRec();vs.classList.remove('show');if(tx.value.trim())setTimeout(()=>sendText(),100);}});
+vb.addEventListener('pointerleave',()=>{if(recording)stopRec();});
 
 // ===== 萌可选择 =====
 (function initGrid(){
   document.getElementById('mokoGrid').innerHTML=MOKOS.map(m=>`
-    <div class="moko-card" onclick="pick('${m.id}')">
-      <img src="${m.img}" alt="${m.name}"><div class="n">${m.e} ${m.name}</div>
-    </div>`).join('');
+    <div class="moko-card" onclick="pick('${m.id}')"><img src="${m.img}" alt="${m.name}"><div class="nc">${m.e} ${m.name}</div></div>`).join('');
 })();
 function pick(id){
-  cm=MOKOS.find(m=>m.id===id); pk.style.display='none';
-  document.getElementById('mokoAv').src=cm.img;
-  document.getElementById('mokoNm').textContent=cm.e+' '+cm.name;
-  sc=parseInt(localStorage.getItem('ms_'+cm.id)||'0'); document.getElementById('starN').textContent=sc;
+  cm=MOKOS.find(m=>m.id===id);pk.style.display='none';
+  document.getElementById('mokoAv').src=cm.img;document.getElementById('mokoNm').textContent=cm.e+' '+cm.name;
+  sc=parseInt(localStorage.getItem('ms_'+cm.id)||'0');document.getElementById('starN').textContent=sc;
   if(!started){started=true;cw=0;goWorld(0);}
 }
 function goWorld(idx){
-  cw=idx; const w=WORLDS[idx]; document.getElementById('worldNm').textContent=w.ic+' '+w.nm;
+  cw=idx;const w=WORLDS[idx];document.getElementById('worldNm').textContent=w.ic+' '+w.nm;
   const a=document.createElement('div');a.className='world-trans';a.innerHTML=`<div class="ic">${w.ic}</div><div class="nm">${w.nm}</div>`;
   document.body.appendChild(a);setTimeout(()=>a.remove(),2000);
-  ms=[];ca.innerHTML=''; addMoko(w.intro);
-  call(w.p,'请用萌可语气说开场白引导探索。给2-3个选项。用 ###CHOICES### 标选项。',true);
+  ms=[];ca.innerHTML='';addMoko(w.intro);
+  call(w.p,'请用中文语气说开场白引导小朋友探索。给2-3个选项。用 ###CHOICES### 标选项。',true);
 }
 
 // ===== 消息 =====
-function addMoko(t,cs){ ms.push({r:'a',c:t}); const d=document.createElement('div');d.className='msg moko'; d.innerHTML=`<img class="avatar" src="${cm.img}" alt=""><div class="bubble">${fm(t)}</div>`; ca.appendChild(d);ca.scrollTop=ca.scrollHeight; speak(t); if(cs&&cs.length){chs=cs;renderCs(cs);} }
-function addYou(t){ ms.push({r:'u',c:t}); const d=document.createElement('div');d.className='msg you'; d.innerHTML=`<div class="bubble">${t}</div>`; ca.appendChild(d);ca.scrollTop=ca.scrollHeight; }
+function addMoko(t,cs){ms.push({r:'a',c:t});const d=document.createElement('div');d.className='msg m';d.innerHTML=`<img class="av" src="${cm.img}" alt=""><div class="bb">${fm(t)}</div>`;ca.appendChild(d);ca.scrollTop=ca.scrollHeight;speak(t);if(cs&&cs.length){chs=cs;renderCs(cs);}}
+function addYou(t){ms.push({r:'u',c:t});const d=document.createElement('div');d.className='msg y';d.innerHTML=`<div class="bb">${t}</div>`;ca.appendChild(d);ca.scrollTop=ca.scrollHeight;}
 function fm(t){return(t||'').replace(/💗/g,'<span style="color:#ff4081">💗</span>').replace(/[⭐🌟]/g,'<span style="color:#ffd700">$&</span>').replace(/👑|🦄/g,'<span style="color:#ce93d8">$&</span>');}
-function renderCs(dt){ cd.innerHTML=dt.map(c=>{ let t=typeof c==='string'?c:(c.text||c.label||''); return `<button class="choice-btn" onclick="pickC('${t.replace(/'/g,"\\'")}')">${t}</button>`; }).join(''); }
+function renderCs(dt){cd.innerHTML=dt.map(c=>{let t=typeof c==='string'?c:(c.text||c.label||'');return `<button class="ch-btn" onclick="pickC('${t.replace(/'/g,"\\'")}')">${t}</button>`;}).join('');}
 function pickC(t){cd.innerHTML='';chs=[];addYou(t);procInput(t);}
 
 // ===== 文字输入 =====
@@ -411,30 +366,28 @@ document.getElementById('sendBtn').addEventListener('click',sendText);
 // ===== AI 调用 =====
 async function call(extra,inst,wChoices){
   if(loading)return;loading=true;cd.innerHTML='';chs=[];
-  const ld=document.createElement('div');ld.className='msg moko';
-  ld.innerHTML=`<img class="avatar" src="${cm.img}" alt=""><div class="bubble"><div class="loading-dots"><span></span><span></span><span></span></div></div>`;
-  ca.appendChild(ld);ca.scrollTop=ca.scrollHeight;
+  const ld=document.createElement('div');ld.className='msg m';ld.innerHTML=`<img class="av" src="${cm.img}" alt=""><div class="bb"><div class="loading-dots"><span></span><span></span><span></span></div></div>`;ca.appendChild(ld);ca.scrollTop=ca.scrollHeight;
 
   const w=WORLDS[cw];
-  const chH=wChoices?'\n\n回复末尾用 ###CHOICES### 标记2-3个选项':'';
-  const sp=`${cm.p}\n\n你在:${w.p}\n\n规则:\n1. 回复2-4句话\n2. 用emoji\n3. 像5-10岁好朋友说话\n4. 鼓励小朋友\n5. 偶尔送⭐作为礼物\n6. 这是第${cw+1}/${WORLDS.length}个世界\n7. 直接回应小朋友说的话，不要重复前面\n8. 你的名字是${cm.e}${cm.name}，自然融入角色${chH}\n用纯中文回复！禁止使用任何其他语言，禁止韩文、英文、日文。禁止成人/暴力/AI相关内容。`;
+  const chH=wChoices?'\n\n用 ###CHOICES### 标2-3个选项':'';
+  const sp=`${cm.p}\n\n你在:${w.p}\n\n规则:\n1. 回复2-4句中文\n2. 用emoji\n3. 像5-10岁好朋友说话\n4. 鼓励小朋友\n5. 偶尔送⭐\n6. 这是第${cw+1}/${WORLDS.length}个世界\n7. 直接回应小朋友${chH}\n禁止任何非中文语言。禁止成人/暴力/AI内容。`;
 
-  const msgs=[{role:'system',content:sp},...ms.slice(-8).map(m=>({role:m.r==='a'?'assistant':'user',content:m.c}))];
+  const msgs=[{role:'system',content:sp},...ms.slice(-6).map(m=>({role:m.r==='a'?'assistant':'user',content:m.c}))];
   if(inst)msgs.push({role:'user',content:inst});
 
   try{
-    const r=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+DEEPSEEK_KEY},body:JSON.stringify({model:'deepseek-chat',messages:msgs,max_tokens:450,temperature:.9,stream:true})});
+    const r=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+DK},body:JSON.stringify({model:'deepseek-chat',messages:msgs,max_tokens:400,temperature:.9,stream:true})});
     if(!r.ok)throw new Error(r.status);
     const reader=r.body.getReader();const dec=new TextDecoder();let ft='';ld.remove();
-    const sd=document.createElement('div');sd.className='msg moko';sd.innerHTML=`<img class="avatar" src="${cm.img}" alt=""><div class="bubble" id="sb"><span class="typing-cursor"></span></div>`;ca.appendChild(sd);
-    while(true){const{done,value}=await reader.read();if(done)break;const lines=dec.decode(value,{stream:true}).split('\n').filter(l=>l.startsWith('data: '));for(const l of lines){const d=l.slice(6).trim();if(d==='[DONE]')continue;try{const j=JSON.parse(d);const dt=j.choices?.[0]?.delta?.content;if(dt)ft+=dt;}catch(_){}} document.getElementById('sb').innerHTML=fm(ft)+'<span class="typing-cursor"></span>';ca.scrollTop=ca.scrollHeight;}
+    const sd=document.createElement('div');sd.className='msg m';sd.innerHTML=`<img class="av" src="${cm.img}" alt=""><div class="bb" id="sb"><span class="typing-cursor"></span></div>`;ca.appendChild(sd);
+    while(true){const{done,value}=await reader.read();if(done)break;const lines=dec.decode(value,{stream:true}).split('\n').filter(l=>l.startsWith('data: '));for(const l of lines){const d=l.slice(6).trim();if(d==='[DONE]')continue;try{const j=JSON.parse(d);const dt=j.choices?.[0]?.delta?.content;if(dt)ft+=dt;}catch(_){}}document.getElementById('sb').innerHTML=fm(ft)+'<span class="typing-cursor"></span>';ca.scrollTop=ca.scrollHeight;}
     document.getElementById('sb').innerHTML=fm(ft);sd.id='';
-    const cmt=ft.match(/###CHOICES###\s*([\s\S]*?)$/); let dt=ft,ch=[]; if(cmt){dt=ft.replace(/###CHOICES###[\s\S]*$/,'').trim();ch=cmt[1].trim().split('\n').map(l=>l.replace(/^[-*\d.]\s*/,'').trim()).filter(Boolean);document.getElementById('sb').innerHTML=fm(dt);}
+    const cmt=ft.match(/###CHOICES###\s*([\s\S]*?)$/);let dt=ft,ch=[];if(cmt){dt=ft.replace(/###CHOICES###[\s\S]*$/,'').trim();ch=cmt[1].trim().split('\n').map(l=>l.replace(/^[-*\d.]\s*/,'').trim()).filter(Boolean);document.getElementById('sb').innerHTML=fm(dt);}
     if(ft.includes('魔法星')||ft.includes('星星袋')){sc++;document.getElementById('starN').textContent=sc;localStorage.setItem('ms_'+cm.id,sc);}
     if((ft.includes('下一站')||ft.includes('去下一个')||ft.includes('新的冒险'))&&cw<WORLDS.length-1&&!ch.some(c=>c.includes('下一个')))ch.push('🌈 出发去下一个世界！');
     ms.push({r:'a',c:dt});speak(dt);if(ch.length){chs=ch;renderCs(ch);}
   }catch(e){
-    ld.remove(); const ed=document.createElement('div');ed.className='msg moko';ed.innerHTML=`<img class="avatar" src="${cm.img}" alt=""><div class="bubble">哎呀，魔法信号不太好😢<br>点按钮重试吧～</div>`;ca.appendChild(ed);ca.scrollTop=ca.scrollHeight;renderCs(['🔄 重新发送','🔙 换个萌可']);
+    ld.remove();const ed=document.createElement('div');ed.className='msg m';ed.innerHTML=`<img class="av" src="${cm.img}" alt=""><div class="bb">哎呀，魔法信号不太好😢<br>点按钮重试吧～</div>`;ca.appendChild(ed);ca.scrollTop=ca.scrollHeight;renderCs(['🔄 重新发送','🔙 换个萌可']);
   }
   loading=false;
 }
