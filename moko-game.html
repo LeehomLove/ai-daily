@@ -264,14 +264,98 @@ function processSpeechQ() {
   if (!speechQueue.length) { speaking=false; speakingInd.classList.remove('show'); return; }
   speaking=true; speakingInd.classList.add('show');
   const text = speechQueue.shift();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang='zh-CN'; u.rate=1.08; u.pitch=1.4; u.volume=0.85;
+
+  // 找最可爱的声音
   const voices = speechSynthesis.getVoices();
-  const v = voices.find(v=>v.lang==='zh-CN') || voices.find(v=>v.lang.startsWith('zh')) || voices[0];
-  if (v) u.voice=v;
+
+  // 给不同的萌可选不同的可爱声音
+  let voice = null;
+  const mokoId = currentMoko ? currentMoko.id : '';
+
+  // 按萌可角色匹配声音
+  if (mokoId === 'heart' || mokoId === 'hope') {
+    // 爱心萌可、盼盼萌可 → 找最温柔的女声
+    voice = voices.find(v => v.name.includes('Tingting') || v.name.includes('Ting-Ting') || v.name.includes('Hsiao')) // 温柔女声
+    || voices.find(v => v.name.includes('Ya') && v.lang.startsWith('zh')) // 雅
+    || voices.find(v => v.name.includes('Mei') && v.lang.startsWith('zh')) // 美
+    || voices.find(v => v.lang === 'zh-CN' && v.name.includes('Female'));
+  } else if (mokoId === 'courage' || mokoId === 'wise') {
+    // 勇气萌可、正正萌可 → 稍微成熟的声音
+    voice = voices.find(v => v.name.includes('Yu') || v.name.includes('Wen')) // 宇/文
+    || voices.find(v => v.lang.startsWith('zh') && (v.name.includes('Female') || v.name.includes('Girl')));
+  } else {
+    // 其他萌可 → 最甜的声音
+    voice = voices.find(v => v.name.includes('Kayan') || v.name.includes('Hsiao'))
+    || voices.find(v => v.lang === 'zh-HK' || v.lang === 'zh-TW');
+  }
+
+  // 兜底：找任何中文女声
+  if (!voice) voice = voices.find(v => v.lang.startsWith('zh') && (
+    v.name.includes('Female') || v.name.includes('Girl') || v.name.includes('Woman') ||
+    v.name.includes('Ting') || v.name.includes('Hsiao') || v.name.includes('Ya') || v.name.includes('Mei')
+  ));
+
+  // 再兜底：任何中文声音
+  if (!voice) voice = voices.find(v => v.lang.startsWith('zh'));
+  // 最后的兜底：任何声音
+  if (!voice) voice = voices[0];
+
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = voice && voice.lang.startsWith('zh') ? voice.lang : 'zh-CN';
+  u.rate = voice && voice.lang === 'zh-HK' ? 1.0 : 1.12;
+  u.pitch = voice && (voice.name.includes('Ting') || voice.name.includes('Hsiao') || voice.name.includes('Kayan') || voice.name.includes('Ya')) ? 1.65 : 1.45;
+  u.volume = 0.9;
+  if (voice) u.voice = voice;
+
   u.onend = u.onerror = () => processSpeechQ();
-  speechSynthesis.speak(u);
+
+  // 添加小停顿让语气更自然
+  const naturalText = text
+    .replace(/！/g, '！ ')
+    .replace(/？/g, '？ ')
+    .replace(/～/g, '～ ')
+    .replace(/💗/g, ' 啾～')
+    .replace(/[🌟⭐✨]/g, '✨')
+    .replace(/⚡/g, '乒！')
+    .replace(/☀️/g, '阳光')
+    .replace(/🎶/g, '啦啦～')
+    .replace(/🍀/g, '幸运')
+    .replace(/📖/g, '')
+    .replace(/🦄/g, '')
+    .replace(/👑/g, '')
+    .replace(/[^*#~`]/g, c => c);
+
+  // 太长的句子拆成短句
+  const sentences = naturalText.split(/(?<=[。！？，\s])/).filter(s => s.trim());
+  if (sentences.length > 1 && sentences.length <= 6) {
+    // 逐句朗读，句间停顿
+    let i = 0;
+    function speakSentence() {
+      if (i >= sentences.length) { processSpeechQ(); return; }
+      const s = sentences[i].trim();
+      i++;
+      if (s.length < 2) { speakSentence(); return; }
+      const subU = new SpeechSynthesisUtterance(s);
+      subU.lang = u.lang; subU.rate = u.rate; subU.pitch = u.pitch; subU.volume = u.volume;
+      if (voice) subU.voice = voice;
+      subU.onend = () => setTimeout(() => speakSentence(), 80);
+      subU.onerror = () => speakSentence();
+      speechSynthesis.speak(subU);
+    }
+    speakSentence();
+  } else {
+    speechSynthesis.speak(u);
+  }
+
+  // 显示当前声音信息用于调试
+  console.log('萌可语音:', mokoId, voice ? voice.name : 'default', 'pitch:', u.pitch);
 }
+
+// 预加载所有语音
+speechSynthesis.onvoiceschanged = () => {
+  const voices = speechSynthesis.getVoices();
+  console.log('可用声音:', voices.filter(v=>v.lang.startsWith('zh')).map(v=>v.name+'('+v.lang+')'));
+};
 
 function toggleSpeech() {
   speechActive = !speechActive;
