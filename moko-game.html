@@ -306,38 +306,27 @@ function initRec(){
     }
   }
 
-  // === iPhone: 第一次点击请求权限 + 之后单击录音/再单击停止 ===
-  // 桌面端: 按住说话松开发送
-
-  let clickCount=0, clickTimer=null;
-
-  // 单击开始录音
-  vb.addEventListener('pointerdown',(e)=>{
-    e.preventDefault();
-    if(isActive){
-      // 正在录 → 停止并发送
-      safeStop();
-      vs.classList.remove('show');
-      if(tx.value.trim()) setTimeout(()=>sendText(),100);
-    } else {
-      // 没在录 → 开始
-      safeStart();
-    }
-  });
-
-  // iOS touch 事件优先
+  // === 按住说话（touchstart 开始，touchend 停止并发送）===
   vb.addEventListener('touchstart',(e)=>{
     e.preventDefault();
+    if(!isActive) safeStart();
+  });
+  vb.addEventListener('touchend',(e)=>{
+    e.preventDefault();
     if(isActive){
       safeStop();
       vs.classList.remove('show');
       if(tx.value.trim()) setTimeout(()=>sendText(),100);
-    } else {
-      safeStart();
     }
   });
+  vb.addEventListener('touchcancel',()=>{ if(isActive){ safeStop(); vs.classList.remove('show'); }});
 
-  console.log('✅ 语音就绪 (单击说话/单击停止)');
+  // 桌面端备用
+  vb.addEventListener('mousedown',(e)=>{ e.preventDefault(); if(!isActive) safeStart(); });
+  vb.addEventListener('mouseup',(e)=>{ e.preventDefault(); if(isActive){ safeStop(); vs.classList.remove('show'); if(tx.value.trim()) setTimeout(()=>sendText(),100); }});
+  vb.addEventListener('mouseleave',()=>{ if(isActive){ safeStop(); vs.classList.remove('show'); }});
+
+  console.log('✅ 语音就绪 (按住说话松开发送)');
 }
 
 // ===== 萌可选择 =====
