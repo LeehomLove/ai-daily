@@ -332,10 +332,31 @@ vb.addEventListener('pointerdown',(e)=>{e.preventDefault(); if(!recording)startR
 vb.addEventListener('pointerup',(e)=>{e.preventDefault(); if(recording){stopRec();vs.classList.remove('show');if(tx.value.trim())setTimeout(()=>sendText(),100);}});
 vb.addEventListener('pointerleave',()=>{if(recording)stopRec();});
 
-// ===== 萌可选择 =====
+// ===== 萌可选择（语音可用性也在这里显示）=====
 (function initGrid(){
+  // 先检测语音是否可用
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const hasSpeech = !!SR;
+
   document.getElementById('mokoGrid').innerHTML=MOKOS.map(m=>`
     <div class="moko-card" onclick="pick('${m.id}')"><img src="${m.img}" alt="${m.name}"><div class="nc">${m.e} ${m.name}</div></div>`).join('');
+
+  // 添加语音状态提示
+  if (!hasSpeech) {
+    const tip = document.createElement('div');
+    tip.style.cssText = 'margin-top:16px;font-size:12px;color:rgba(255,255,255,.4);text-align:center;';
+    tip.textContent = '⚠️ 语音功能需 Safari 14+ 或 Chrome';
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      // 预请求权限
+      navigator.mediaDevices.getUserMedia({audio:true}).then(()=>{
+        tip.textContent = '✅ 麦克风可用，选择萌可后点击🎤说话';
+        tip.style.color = 'rgba(255,255,255,.6)';
+      }).catch(()=>{
+        tip.textContent = '⚠️ 需要在手机设置中允许麦克风';
+      });
+    }
+    document.querySelector('.moko-pick').appendChild(tip);
+  }
 })();
 function pick(id){
   cm=MOKOS.find(m=>m.id===id);pk.style.display='none';
