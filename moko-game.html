@@ -166,7 +166,7 @@
 
   <div class="input-area">
     <div class="input-row">
-      <button class="voice-btn" id="voiceBtn" title="按住说话">🎤</button>
+      <button class="voice-btn" id="voiceBtn" title="点击说话">🎤</button>
       <input class="text-input" id="textInp" type="text" placeholder="输入想说的话…" maxlength="200" autocomplete="off">
       <button class="send-btn" id="sendBtn" onclick="sendText()">📤</button>
     </div>
@@ -306,30 +306,38 @@ function initRec(){
     }
   }
 
-  // === 按住说话，松开发送 ===
+  // === iPhone: 第一次点击请求权限 + 之后单击录音/再单击停止 ===
+  // 桌面端: 按住说话松开发送
+
+  let clickCount=0, clickTimer=null;
+
+  // 单击开始录音
   vb.addEventListener('pointerdown',(e)=>{
     e.preventDefault();
-    if(!isActive)safeStart();
+    if(isActive){
+      // 正在录 → 停止并发送
+      safeStop();
+      vs.classList.remove('show');
+      if(tx.value.trim()) setTimeout(()=>sendText(),100);
+    } else {
+      // 没在录 → 开始
+      safeStart();
+    }
   });
-  vb.addEventListener('pointerup',(e)=>{
+
+  // iOS touch 事件优先
+  vb.addEventListener('touchstart',(e)=>{
     e.preventDefault();
     if(isActive){
       safeStop();
       vs.classList.remove('show');
-      // 如果有识别结果就发送
-      if(tx.value.trim()){
-        setTimeout(()=>sendText(),100);
-      }
+      if(tx.value.trim()) setTimeout(()=>sendText(),100);
+    } else {
+      safeStart();
     }
   });
-  vb.addEventListener('pointerleave',()=>{if(isActive){safeStop();vs.classList.remove('show');}});
-  vb.addEventListener('pointercancel',()=>{if(isActive){safeStop();vs.classList.remove('show');}});
 
-  // 也支持 touch 事件（兼容老 iOS）
-  vb.addEventListener('touchstart',(e)=>{if(!isActive){e.preventDefault();safeStart();}});
-  vb.addEventListener('touchend',(e)=>{if(isActive){e.preventDefault();safeStop();vs.classList.remove('show');if(tx.value.trim())setTimeout(()=>sendText(),100);}});
-
-  console.log('✅ 语音就绪 (豆包模式: 按住说话松开发送)');
+  console.log('✅ 语音就绪 (单击说话/单击停止)');
 }
 
 // ===== 萌可选择 =====
