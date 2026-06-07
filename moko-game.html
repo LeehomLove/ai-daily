@@ -386,10 +386,7 @@ function initSpeech() {
     const t=(finalText||interimText).trim();
     if(t && (finalText||interimText.length>3)){
       textInput.value=t;
-      // iOS 上不加延时可能导致 sendText 为空
-      requestAnimationFrame(()=>{
-        requestAnimationFrame(()=>sendText());
-      });
+      sendText();
     }
     stopRecording();
   };
