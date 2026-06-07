@@ -253,9 +253,10 @@ function speakText(text) {
   const clean = text
     .replace(/###CHOICES###[\s\S]*$/,'')
     .replace(/[*#_~`]/g,'')
+    .replace(/```[\s\S]*?```/g,'')
     .replace(/[^一-鿿　-〿＀-￯a-zA-Z0-9，。！？、：；""''（）\s]/g,'')
     .trim();
-  if (clean.length < 4) return;
+  if (clean.length < 2) return;
   speechQueue.push(clean);
   if (!speaking) processSpeechQ();
 }
