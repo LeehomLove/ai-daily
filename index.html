@@ -249,7 +249,7 @@
 <script>
   // ===== Config =====
   const API_DIRECT  = 'https://aihot.virxact.com/api/public/items?mode=selected&take=50';
-  const API_PROXIED = 'https://whateverorigin.org/get?url=' + encodeURIComponent(API_DIRECT);
+  const API_PROXY   = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(API_DIRECT);
   const CACHE_KEY = 'ai_daily_cache';
   const CACHE_DURATION = 10 * 60 * 1000; // 10 min
 
@@ -293,25 +293,26 @@
     }
 
     try {
-      const resp = await fetch(API_DIRECT).catch(() => fetch(API_PROXIED));
-      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-      let data = await resp.text();
+      let data, isProxied = false;
+      try {
+        const resp = await fetch(API_DIRECT, { signal: AbortSignal.timeout(8000) });
+        data = await resp.json();
+      } catch(e) {
+        const resp = await fetch(API_PROXY);
+        data = await resp.json();
+        isProxied = true;
+      }
 
-      // whateverorigin wraps response in { contents: "..." }
-      try { const json = JSON.parse(data); if (json.contents) data = json.contents; } catch(_) {}
-
-      const parsed = JSON.parse(data);
-
-      // AIHOT 返回格式: { items: [...], total, ... } 或直接数组
-      const raw = Array.isArray(parsed) ? parsed : (parsed.items || parsed.data || []);
-      allItems = raw.map(item => ({
+      // AIHOT fields: title, title_en, summary, category, source, url, publishedAt
+      const items = Array.isArray(data) ? data : (data.items || data.data || []);
+      allItems = items.map(item => ({
         id: item.id || Math.random(),
-        title: item.title_zh || item.title || '无标题',
-        summary: item.summary_zh || item.summary || item.content_zh || item.content || '',
+        title: item.title || item.title_zh || item.title_en || '',
+        summary: item.summary || item.summary_zh || item.content || '',
         category: (item.category || 'other').toLowerCase(),
-        source: item.source_name || item.source || '',
+        source: item.source || item.source_name || '',
         url: item.url || item.link || '',
-        published: item.published_at || item.created_at || item.date || ''
+        published: item.publishedAt || item.published_at || ''
       }));
 
       // Save cache
