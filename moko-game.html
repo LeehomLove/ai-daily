@@ -166,7 +166,7 @@
 
   <div class="input-area">
     <div class="input-row">
-      <button class="voice-btn" id="voiceBtn" title="点击开始说话">🎤</button>
+      <button class="voice-btn" id="voiceBtn" title="按住说话">🎤</button>
       <input class="text-input" id="textInp" type="text" placeholder="输入想说的话…" maxlength="200" autocomplete="off">
       <button class="send-btn" id="sendBtn" onclick="sendText()">📤</button>
     </div>
@@ -257,122 +257,79 @@ function toggleSpeech(){spActive=!spActive;if(!spActive){speechSynthesis.cancel(
 
 // ===== 语音输入 - 简化版（iOS 单次点击方案）=====
 let rec=null;
+// ===== 语音输入 - 按住说话，松开发送（豆包模式）=====
+let activeRec=null, isActive=false;
+
 function initRec(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){vb.style.opacity='0.3';vb.title='语音不可用';return;}
 
-  let activeRec=null, isActive=false;
-
   function safeStop(){
-    if(activeRec){
-      try{activeRec.stop();}catch(e){}
-      try{activeRec.abort();}catch(e){}
-      activeRec=null;
-    }
-    isActive=false;
-    vb.classList.remove('rec');
-    vb.textContent='🎤';
+    if(activeRec){try{activeRec.stop();}catch(e){};try{activeRec.abort();}catch(e){};activeRec=null;}
+    isActive=false;vb.classList.remove('rec');vb.textContent='🎤';
   }
 
   function safeStart(){
     safeStop();
-    const r=new SR();
-    activeRec=r;
-    r.lang='zh-CN';
-    r.continuous=false;
-    r.interimResults=true;
+    const r=new SR();activeRec=r;
+    r.lang='zh-CN';r.continuous=false;r.interimResults=true;
 
-    r.onspeechstart=()=>{ vsText.textContent='正在听…'; vsRes.textContent=''; };
-    r.onaudiostart=()=>{ vsText.textContent='🎙 麦克风工作中…'; };
+    r.onaudiostart=()=>{vsText.textContent='🎙 正在听…';vsRes.textContent='';};
+    r.onspeechstart=()=>{vsText.textContent='🎙 正在听…';};
 
     r.onresult=(ev)=>{
       let ft='',it='';
-      for(let i=0;i<ev.results.length;i++){
-        const re=ev.results[i];
-        if(re.isFinal)ft+=re[0].transcript;else it+=re[0].transcript;
-      }
-      const result=ft||it;
-      const text=result.trim();
-      if(text.length>1){
-        tx.value=text;
-        vsRes.textContent=text;
-        vsText.textContent='✅ 听到了！';
-        safeStop();
-        setTimeout(()=>{vs.classList.remove('show');sendText();},400);
-      }
+      for(let i=0;i<ev.results.length;i++){const re=ev.results[i];if(re.isFinal)ft+=re[0].transcript;else it+=re[0].transcript;}
+      const result=ft||it;const text=result.trim();
+      if(text.length>1){tx.value=text;vsRes.textContent=text;vsText.textContent='✅';}
+      // iOS 上结果来了不要停，等用户松手
     };
 
     r.onerror=(e)=>{
       const err=e.error;
-      if(err==='aborted'){
-        safeStop();
-        vs.classList.remove('show');
-      }else if(err==='no-speech'){
-        vsText.textContent='没听到声音～';
-        safeStop();
-        setTimeout(()=>vs.classList.remove('show'),1200);
-      }else if(err==='not-allowed'){
-        vsText.textContent='麦克风权限被拒绝 ❌';
-        vsRes.textContent='请打开：设置 → Safari → 允许麦克风';
-        safeStop();
-        setTimeout(()=>vs.classList.remove('show'),3000);
-      }else if(err==='audio-capture'){
-        vsText.textContent='找不到麦克风';
-        safeStop();
-        setTimeout(()=>vs.classList.remove('show'),2000);
-      }else if(err==='network'){
-        vsText.textContent='网络问题，请重试';
-        safeStop();
-        setTimeout(()=>vs.classList.remove('show'),2000);
-      }else{
-        vsText.textContent='语音失败: '+err;
-        safeStop();
-        setTimeout(()=>vs.classList.remove('show'),2000);
-      }
+      if(err==='aborted'){/* 用户松手，正常 */}
+      else if(err==='no-speech'){vsText.textContent='没听到声音～';safeStop();setTimeout(()=>vs.classList.remove('show'),1000);}
+      else if(err==='not-allowed'){vsText.textContent='请打开设置允许麦克风';safeStop();setTimeout(()=>vs.classList.remove('show'),2500);}
+      else if(err==='network'){vsText.textContent='网络问题';safeStop();setTimeout(()=>vs.classList.remove('show'),1500);}
+      else{vsText.textContent='语音失败';safeStop();setTimeout(()=>vs.classList.remove('show'),1500);}
     };
 
-    r.onend=()=>{
-      // onend 在 onresult 之后触发，检查是否有文字输入
-      if(!tx.value.trim()){
-        safeStop();
-      }
-    };
+    r.onend=()=>{/* onend 不做任何事，等松手处理 */};
 
     try{
-      isActive=true;
-      vb.classList.add('rec');
-      vb.textContent='🔴';
+      isActive=true;vb.classList.add('rec');vb.textContent='🔴';
       r.start();
+      vs.classList.add('show');vsText.textContent='🎙 正在听…';vsRes.textContent='';
     }catch(ex){
-      vsText.textContent='请先允许麦克风';
-      vsRes.textContent='';
-      safeStop();
-      setTimeout(()=>vs.classList.remove('show'),2000);
+      vsText.textContent='请允许麦克风';
+      safeStop();setTimeout(()=>vs.classList.remove('show'),2000);
     }
   }
 
-  // 单击开始，再单击停止
-  vb.onclick=(e)=>{
+  // === 按住说话，松开发送 ===
+  vb.addEventListener('pointerdown',(e)=>{
     e.preventDefault();
-    e.stopPropagation();
-
+    if(!isActive)safeStart();
+  });
+  vb.addEventListener('pointerup',(e)=>{
+    e.preventDefault();
     if(isActive){
-      // 停止
       safeStop();
       vs.classList.remove('show');
+      // 如果有识别结果就发送
       if(tx.value.trim()){
         setTimeout(()=>sendText(),100);
       }
-    }else{
-      // 开始
-      vs.classList.add('show');
-      vsText.textContent='准备录音…';
-      vsRes.textContent='';
-      safeStart();
     }
-  };
+  });
+  vb.addEventListener('pointerleave',()=>{if(isActive){safeStop();vs.classList.remove('show');}});
+  vb.addEventListener('pointercancel',()=>{if(isActive){safeStop();vs.classList.remove('show');}});
 
-  console.log('✅ 语音就绪 (iOS)');
+  // 也支持 touch 事件（兼容老 iOS）
+  vb.addEventListener('touchstart',(e)=>{if(!isActive){e.preventDefault();safeStart();}});
+  vb.addEventListener('touchend',(e)=>{if(isActive){e.preventDefault();safeStop();vs.classList.remove('show');if(tx.value.trim())setTimeout(()=>sendText(),100);}});
+
+  console.log('✅ 语音就绪 (豆包模式: 按住说话松开发送)');
 }
 
 // ===== 萌可选择 =====
