@@ -458,9 +458,15 @@ async function callAI(extra, instruction, withChoices) {
 3. 总是鼓励小朋友，表扬他们的选择
 4. 偶尔送魔法星⭐作为礼物
 5. 这是第${currentWorld+1}/${WORLDS.length}个世界${chHint}
-禁止成人、暴力内容，不要离开萌可角色。`;
+6. 不要重复前面的对话，直接回应小朋友说的话
+7. 你的名字是「${currentMoko.emoji}${currentMoko.name}」，自然而然地融入角色
+禁止成人、暴力、AI、计算机相关内容，不要离开萌可角色。`;
 
-  const msgs=[{role:'system',content:sp},...messages.slice(-20).map(m=>({role:m.role==='assistant'?'assistant':'user',content:m.content}))];
+  const msgs=[
+    {role:'system',content:sp},
+    // 只保留最近5轮对话作为上下文，让AI直接响应当前问题
+    ...messages.slice(-10).map(m=>({role:m.role==='assistant'?'assistant':'user',content:m.content}))
+  ];
   if(instruction) msgs.push({role:'user',content:instruction});
 
   try {
