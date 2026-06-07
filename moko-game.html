@@ -274,16 +274,6 @@ function initRec(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){vb.style.opacity='0.3';vb.title='语音不可用';return;}
 
-  // 尝试先请求麦克风权限
-  if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
-    navigator.mediaDevices.getUserMedia({audio:true}).then(()=>{
-      console.log('✅ 麦克风权限已获取');
-    }).catch(()=>{
-      console.log('⚠️ 麦克风权限被拒绝，请检查 Safari 设置');
-      vb.style.opacity='0.5';
-    });
-  }
-
   rec=new SR();
   rec.lang='zh-CN'; rec.continuous=false; rec.interimResults=true;
   rec.onresult=(ev)=>{
@@ -291,31 +281,60 @@ function initRec(){
     for(let i=0;i<ev.results.length;i++){ const r=ev.results[i]; if(r.isFinal)ft+=r[0].transcript; else it+=r[0].transcript; }
     const tx=(ft||it).trim();
     if(tx&&tx.length>1){
-      // iOS 上必须设置 input 值并触发 send
       document.getElementById('textInp').value=tx;
-      setTimeout(()=>sendText(), 100);
+      // 重要：iOS 上必须在 onresult 完成后再调用 sendText
+      stopRec();
+      setTimeout(()=>sendText(), 200);
+    } else {
+      stopRec();
     }
-    stopRec();
   };
-  rec.onerror=(e)=>{console.warn('语音错误:',e.error); stopRec();};
+  rec.onerror=(e)=>{
+    console.warn('语音错误:',e.error);
+    // iOS 上常见的几个可以忽略的错误
+    if(e.error==='no-speech'||e.error==='aborted'){
+      stopRec();
+    } else {
+      stopRec();
+    }
+  };
   rec.onend=stopRec;
   rec.onaudiostart=()=>console.log('🎙 正在听…');
   rec.onspeechstart=()=>console.log('🗣 检测到说话…');
 }
 
+function tryMicPermission(){
+  // iOS Safari 需要用户交互后才能获取麦克风权限
+  if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
+    navigator.mediaDevices.getUserMedia({audio:true}).then((stream)=>{
+      console.log('✅ 麦克风权限已获取');
+      stream.getTracks().forEach(t=>t.stop()); // 立即释放
+      vb.style.opacity='1';
+      vb.title='按住说话';
+    }).catch(()=>{
+      console.log('⚠️ 麦克风权限被拒绝');
+      vb.style.opacity='0.5';
+    });
+  }
+}
+
 function startRec(){
   if(!rec)return;
-  try{
-    // 先中断之前的
-    try{rec.abort();}catch(e){}
-    setTimeout(()=>{
-      try{
-        recording=true; vb.classList.add('rec'); vb.textContent='🔴';
-        rec.start();
-        console.log('▶ 录音开始');
-      }catch(e){stopRec();}
-    },150);
-  }catch(e){stopRec();}
+  // iOS Safari 每次 start 前不能有未结束的实例
+  try{rec.abort();}catch(e){}
+  setTimeout(()=>{
+    try{
+      recording=true; vb.classList.add('rec'); vb.textContent='🔴';
+      rec.start();
+    }catch(e){
+      console.log('rec.start error:',e);
+      // 可能因为权限未获取，尝试请求权限后重试
+      if(e.message&&e.message.includes('not-allowed')){
+        tryMicPermission();
+      }
+      stopRec();
+    }
+  },100);
 }
 
 function stopRec(){
@@ -324,13 +343,36 @@ function stopRec(){
   try{rec.stop();}catch(e){}
 }
 
-// iOS 用 touch 事件, 桌面用 pointer
-vb.addEventListener('touchstart',(e)=>{e.preventDefault();startRec();},{passive:false});
-vb.addEventListener('touchend',(e)=>{e.preventDefault();stopRec();},{passive:false});
+// iOS: 第一次点击按钮时请求麦克风权限
+vb.addEventListener('pointerdown',(e)=>{
+  e.preventDefault();
+  if(!rec) return;
+  // 第一次交互时尝试激活麦克风
+  tryMicPermission();
+  startRec();
+});
+vb.addEventListener('pointerup',(e)=>{
+  e.preventDefault();
+  stopRec();
+});
+vb.addEventListener('pointerleave',stopRec);
+
+// 兼容旧 iOS 的 touch 事件
+vb.addEventListener('touchstart',(e)=>{
+  // 不需要 preventDefault，让 pointer 事件处理
+  if(!window.PointerEvent){
+    e.preventDefault();
+    tryMicPermission();
+    startRec();
+  }
+},{passive:true});
+vb.addEventListener('touchend',(e)=>{
+  if(!window.PointerEvent){
+    e.preventDefault();
+    stopRec();
+  }
+},{passive:true});
 vb.addEventListener('touchcancel',stopRec);
-vb.addEventListener('mousedown',(e)=>{e.preventDefault();startRec();});
-vb.addEventListener('mouseup',(e)=>{e.preventDefault();stopRec();});
-vb.addEventListener('mouseleave',stopRec);
 
 // ===== 萌可选择 =====
 (function initGrid(){
